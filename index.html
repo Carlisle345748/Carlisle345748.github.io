@@ -172,7 +172,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2020-05-17 09:09:10 / 修改时间：23:07:15" itemprop="dateCreated datePublished" datetime="2020-05-17T09:09:10+08:00">2020-05-17</time>
+              <time title="创建时间：2020-05-17 09:09:10 / 修改时间：23:53:39" itemprop="dateCreated datePublished" datetime="2020-05-17T09:09:10+08:00">2020-05-17</time>
             </span>
 
           
@@ -207,7 +207,7 @@
 <li>库函数(libraries routines)。几乎所有的C程序都要使用C标准库中的函<br>数，如printf()函数。printf()函数真正的代码储存在另一个被称为库的文件中。库文件中有许多函数的目标代码。</li>
 </ul>
 <p>链接器(linker)把目标代码文件、对应操作系统的启动代码和所使用的的库函数的代码合并成一个文件(可执行文件)，程序才可运行。</p>
-<p><img src="https://raw.githubusercontent.com/Carlisle345748/cloudimg/master/img/%E7%BC%96%E8%AF%91%E5%99%A8%E5%92%8C%E9%93%BE%E6%8E%A5%E5%99%A8.png" alt="编译器和链接器"></p>
+<p><img src="https://gitee.com/Carlisle345748/cloudimg/raw/master/img/%E7%BC%96%E8%AF%91%E5%99%A8%E5%92%8C%E9%93%BE%E6%8E%A5%E5%99%A8.png" alt="编译器和链接器"></p>
 <h2 id="Unix系统上编译C语言"><a href="#Unix系统上编译C语言" class="headerlink" title="Unix系统上编译C语言"></a>Unix系统上编译C语言</h2><ul>
 <li><p>编译命令’cc’，原本的’cc’是unix的c编译器，但是已经不再使用，cc现在常作为其他编译器的别名</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cc mycode.c</span><br></pre></td></tr></table></figure>
@@ -277,7 +277,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-05-17 23:10:32" itemprop="dateModified" datetime="2020-05-17T23:10:32+08:00">2020-05-17</time>
+                <time title="修改时间：2020-05-17 23:53:29" itemprop="dateModified" datetime="2020-05-17T23:53:29+08:00">2020-05-17</time>
               </span>
 
           
@@ -293,8 +293,8 @@
       
           <h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><p>浮点数在计算机中储存方式遵循<strong>IEEE 754</strong>浮点数计数标准，可以表示<strong>尾数+阶码（有效数字+指数位）</strong>：<br>$$<br>1.M…\times2^E<br>$$</p>
 <p>计算机中浮点数的储存结构如下图所示，包括符号位(S)，阶码(E)和尾数(M)</p>
-<p><img src="https://raw.githubusercontent.com/Carlisle345748/cloudimg/master/img/float%E5%82%A8%E5%AD%98%E7%BB%93%E6%9E%84.jpg" alt="float"></p>
-<p><img src="https://raw.githubusercontent.com/Carlisle345748/cloudimg/master/img/double%E5%82%A8%E5%AD%98%E7%BB%93%E6%9E%84.jpg" alt="double"></p>
+<p><img src="https://gitee.com/Carlisle345748/cloudimg/raw/master/img/float%E5%82%A8%E5%AD%98%E7%BB%93%E6%9E%84.jpg" alt="float"></p>
+<p><img src="https://gitee.com/Carlisle345748/cloudimg/raw/master/img/double%E5%82%A8%E5%AD%98%E7%BB%93%E6%9E%84.jpg" alt="double"></p>
 <ul>
 <li><p>符号部分(s)</p>
 <p>0-正，1-负</p>
@@ -322,7 +322,7 @@
 <li>尾数部分(M)：第一个整数”1”不储存，截去23位后的部分，尾数部分为<strong>10010111000010100011111</strong></li>
 </ul>
 <p>因此最终结果为：</p>
-<p><img src="https://raw.githubusercontent.com/Carlisle345748/cloudimg/master/img/%E6%B5%AE%E7%82%B9%E6%95%B0%E5%82%A8%E5%AD%98%E4%BE%8B%E5%AD%90.png" alt="浮点数储存例子"></p>
+<p><img src="https://gitee.com/Carlisle345748/cloudimg/raw/master/img/%E6%B5%AE%E7%82%B9%E6%95%B0%E5%82%A8%E5%AD%98%E4%BE%8B%E5%AD%90.png" alt="浮点数储存例子"></p>
 <p>其中<code>0x40CB851F</code>为十六进制表达。</p>
 
       
