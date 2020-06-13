@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="C预处理器C预处理器在程序执行之前查看程序（故称之为预处理器）。根据程序的预处理器指令，预处理器把符号缩写替换成其表示的内容、预处包含程序所需的其他文件、以告诉编译器应该查看哪些代码。 翻译程序的第一步在预处理之前，编译器必须对该程序进行一些翻译处理  第一步：把源代码中出现的字符映射到源字符集。该过程处理多字节字符和三字符序列；  第二步：编译器定位每个反斜杠\后面跟着换行符的实例，并删除它们。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C预处理器和C库">
+<meta property="og:url" content="http://yoursite.com/2020/06/13/C%E9%A2%84%E5%A4%84%E7%90%86%E5%99%A8%E5%92%8CC%E5%BA%93/index.html">
+<meta property="og:site_name" content="崔梓坤的个人博客">
+<meta property="og:description" content="C预处理器C预处理器在程序执行之前查看程序（故称之为预处理器）。根据程序的预处理器指令，预处理器把符号缩写替换成其表示的内容、预处包含程序所需的其他文件、以告诉编译器应该查看哪些代码。 翻译程序的第一步在预处理之前，编译器必须对该程序进行一些翻译处理  第一步：把源代码中出现的字符映射到源字符集。该过程处理多字节字符和三字符序列；  第二步：编译器定位每个反斜杠\后面跟着换行符的实例，并删除它们。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://gitee.com/Carlisle345748/cloudimg/raw/master/img/macro.png">
+<meta property="og:image" content="https://gitee.com/Carlisle345748/cloudimg/raw/master/img/%E7%B1%BB%E5%87%BD%E6%95%B0%E5%AE%8F.png">
+<meta property="article:published_time" content="2020-06-13T10:29:31.000Z">
+<meta property="article:modified_time" content="2020-06-13T10:33:13.487Z">
+<meta property="article:author" content="崔梓坤">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gitee.com/Carlisle345748/cloudimg/raw/master/img/macro.png">
+
+<link rel="canonical" href="http://yoursite.com/2020/06/13/C%E9%A2%84%E5%A4%84%E7%90%86%E5%99%A8%E5%92%8CC%E5%BA%93/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>C预处理器和C库 | 崔梓坤的个人博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">崔梓坤的个人博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/06/13/C%E9%A2%84%E5%A4%84%E7%90%86%E5%99%A8%E5%92%8CC%E5%BA%93/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="崔梓坤">
+      <meta itemprop="description" content="我的计算机学习经历和笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="崔梓坤的个人博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          C预处理器和C库
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-06-13 18:29:31 / 修改时间：18:33:13" itemprop="dateCreated datePublished" datetime="2020-06-13T18:29:31+08:00">2020-06-13</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="C预处理器"><a href="#C预处理器" class="headerlink" title="C预处理器"></a>C预处理器</h2><p>C预处理器在程序执行之前查看程序（故称之为预处理器）。根据程序的预处理器指令，预处理器把符号缩写替换成其表示的内容、预处包含程序所需的其他文件、以告诉编译器应该查看哪些代码。</p>
+<h3 id="翻译程序的第一步"><a href="#翻译程序的第一步" class="headerlink" title="翻译程序的第一步"></a>翻译程序的第一步</h3><p>在预处理之前，编译器必须对该程序进行一些翻译处理</p>
+<ul>
+<li><p>第一步：把源代码中出现的字符映射到源字符集。该过程处理多字节字符和三字符序列；</p>
+</li>
+<li><p>第二步：编译器定位每个反斜杠<code>\</code>后面跟着换行符的实例，并删除它们。也就是说，把下面两个物理行(physical line)转换成一个逻辑行(logic line) ，预处理中预处理表达式的长度必须是一个逻辑行；</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 两个物理行</span></span><br><span class="line"><span class="built_in">printf</span>(<span class="string">"That's wond\</span></span><br><span class="line"><span class="string">erful!\n"</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 转化为一个逻辑行</span></span><br><span class="line"><span class="built_in">printf</span>(<span class="string">"That's wonderful!\n"</span>);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>第三步：编译器把文本划分成预处理记号(token)序列、空白(whitespace)序列和注释序列（记号是由空格、制表符或换行符分隔的项)。这里要注意的是，编译器将用一个空格字符替换每一条注释。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span><span class="comment">/*looks not like a space*/</span>fox;</span><br></pre></td></tr></table></figure>
+
+<p>将变成</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> fox;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>最后，程序已经准备好进入预处理阶段，预处理器查找一行中以#号开始的预处理指令。</p>
+</li>
+</ul>
+<h3 id="define"><a href="#define" class="headerlink" title="#define"></a>#define</h3><p><strong>两个重点：</strong></p>
+<ul>
+<li>预处理器指令从#开始运行，到后面的第1个换行符为止。也就是说，指令的长度仅限于一行。</li>
+<li>预处理指令可以出现在源代码文件的任何地方，其定义从指令出现的地方到该文件末尾有效。</li>
+</ul>
+<p><strong>每行#define（逻辑行）都由3部分组成：</strong></p>
+<ul>
+<li><strong>第1部分</strong>：#define指令本身。ANSI和后来的标准都允许#号前面有空格或制表符，而且还允许在#和指令的其余部分之间有空格。但是旧版本的C要求指令从一行最左边开始， 而且#和指令其余部分之间不能有空格。</li>
+<li><strong>第2部分</strong>：选定的缩写，也称为宏(macro)。可以分为对象宏(object-like macro)和函数宏(function-like macro)。<strong>宏的名称中不允许有空格</strong>，而且必须遵循C变量的命名规则：只能使用字符、数字和下划线（_）字符，而且首字符不能是数字；</li>
+<li><strong>第3部分</strong>：替换列表或替换体，一旦预处理器在程序中找到宏的示实例后，就会用替换体代替该宏。从宏变成最终替换文本的过程称为宏展开(macro expansion)</li>
+</ul>
+<img src="https://gitee.com/Carlisle345748/cloudimg/raw/master/img/macro.png" style="zoom:50%;" />
+
+<p><strong>宏可以表示常量、字符串、C表达式、空宏：</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> TWO 2</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> FOUR TWO*TWO</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> WORD <span class="meta-string">"I am a macro"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> PR printf(<span class="meta-string">"I work as a expression\n"</span>)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> NONE</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">int</span> x = FOUR;</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">"%d %d\n"</span>, TWO, x);</span><br><span class="line">  <span class="built_in">puts</span>(WORD);</span><br><span class="line">  PR;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">2 4</span></span><br><span class="line"><span class="comment">I am a macro</span></span><br><span class="line"><span class="comment">I work as a expression</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<p>有人可能认为FOUR被替换成4，但是实际的过程是：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">x = FOUR;</span><br><span class="line">x = TWO*TWO;</span><br><span class="line">x = <span class="number">2</span>*<span class="number">2</span>;</span><br></pre></td></tr></table></figure>
+
+<p>宏展开到此处为止，不会计算2<em>2然后变成x=4。由于编译器在编译期对所有的常量表达式（只包含常量的表达式）求值，所以*</em>预处理器不会进行实际的乘法运算，这一过程在 编译时进行。预处理器不做计算，不对表达式求值，它只进行替换。**</p>
+<p>同时，需要注意，#define指令的作用域是其出现的地方到文件末尾，因此必须要先定义TWO，才能定义FOUR。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> FOUR TWO*TWO   <span class="comment">// 错误，TWO还没定义</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> TWO 2</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> FOUR TWO*TWO   <span class="comment">// 正确</span></span></span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>双引号中的宏不会替换</strong></p>
+<p>一般而言，预处理器发现程序中的宏后，会用宏等价的替换文本进行替换。如果替换的字符串中还包含宏，则继续替换这些宏。唯一例外的是双引号中的宏。因此，下面的语句：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> TWO 2</span></span><br><span class="line"><span class="built_in">printf</span>(<span class="string">"TWO\n"</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">/* </span></span><br><span class="line"><span class="comment">打印结果：</span></span><br><span class="line"><span class="comment">TOW</span></span><br><span class="line"><span class="comment">而不是：</span></span><br><span class="line"><span class="comment">2</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="记号-token"><a href="#记号-token" class="headerlink" title="记号(token)"></a>记号(token)</h4><p>从技术角度来看，可以把宏的替换体看作是记号（token）型字符串， 而不是字符型字符串。C预处理器记号是宏定义的替换体中单独的“词”。用空白把这些词分开。例如：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> FOUR 2*2</span></span><br></pre></td></tr></table></figure>
+
+<p>该宏定义有一个记号：<code>2*2</code>序列。但是，下面的宏定义中：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> FOUR 2 * 3</span></span><br></pre></td></tr></table></figure>
+
+<p>有3个记号：<code>2</code>、<code>*</code>、<code>3</code>。</p>
+<p>替换体中有多个空格时，字符型字符串和记号型字符串的处理方式不 同。考虑下面的定义：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> EIGHT 4  *  8</span></span><br></pre></td></tr></table></figure>
+
+<p>如果预处理器把该替换体解释为字符型字符串，将用<code>4  *  8</code>替换EIGHT。 即，额外的空格是替换体的一部分。如果预处理器把该替换体解释为记号型字符串，则用3个记号<code>4 * 8</code>（分别由单个空格分隔）来替换EIGHT。换而言之，解释为字符型字符串，把空格视为替换体的一部分；解释为记号型字 符串，把空格视为替换体中各记号的分隔符</p>
+<h4 id="在-define中使用参数"><a href="#在-define中使用参数" class="headerlink" title="在#define中使用参数"></a>在#define中使用参数</h4><p>在#define中使用参数可以创建外形和作用与函数类似的类函数宏(function-like macro)。</p>
+<img src="https://gitee.com/Carlisle345748/cloudimg/raw/master/img/类函数宏.png" style="zoom:50%;" />
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> SQUARE(X) ((X)*(X))</span></span><br><span class="line"><span class="keyword">int</span> z;</span><br><span class="line">z = SQUARE(<span class="number">2</span>);</span><br></pre></td></tr></table></figure>
+
+<p>这看上去像函数调用，但是它的行为和函数调用完全不同，并且注意到在定义中使用了很多括号。下面的例子演示了类函数宏和另一个宏的用法。该示例中有一些陷阱，在使用类函数宏的时候一定要注意（括号就是用来避开陷阱的）。</p>
+<p><strong>常见陷阱：</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> SQUARE(X) X*X</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> PR(X) printf(<span class="meta-string">"The result is %d.\n"</span>, X)</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> x = <span class="number">5</span>;</span><br><span class="line">    <span class="keyword">int</span> z;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"x = %d\n"</span>, x);</span><br><span class="line">    z = SQUARE(x);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"Evaluating SQUARE(x): "</span>);</span><br><span class="line">    PR(z);</span><br><span class="line">    z = SQUARE(<span class="number">2</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"Evaluating SQUARE(2): "</span>);</span><br><span class="line">    PR(z);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"Evaluating SQUARE(x+2): "</span>);</span><br><span class="line">    PR(SQUARE(x+<span class="number">2</span>));</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"Evaluating 100/SQUARE(2): "</span>);</span><br><span class="line">    PR(SQUARE(<span class="number">100</span>/SQUARE(<span class="number">2</span>)));</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"x is %d\n"</span>, x);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"Evaluating 100/SQUARE(++x): "</span>);</span><br><span class="line">    PR(SQUARE(++x));</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;      </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">x = 5</span></span><br><span class="line"><span class="comment">Evaluating SQUARE(x): The result is 25.</span></span><br><span class="line"><span class="comment">Evaluating SQUARE(2): The result is 4.</span></span><br><span class="line"><span class="comment">Evaluating SQUARE(x+2): The result is 17.</span></span><br><span class="line"><span class="comment">Evaluating 100/SQUARE(2): The result is 100.</span></span><br><span class="line"><span class="comment">x is 5</span></span><br><span class="line"><span class="comment">Evaluating 100/SQUARE(++x): The result is 42.</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<p>前两行与预期相符，但是接下来的结果有点奇怪。程序中设置x的值为5，你可能认为<code>SQUARE(x+2)</code>应该是 <code>7*7</code>，即 49。但是输出结果是17。这是因为预处理器不做计算，只做替换，所以<code>SQUARE(x+2)</code>实际变成了<code>x+2*x+2</code>，结果为17。</p>
+<p>同样，<code>100/SQUARE(2)</code>替换为<code>100/2*2</code>，所以结果还是100。<code>SQUARE(++x)</code>被替换为<code>++x*++x</code>，递增了两次x，一次在乘法运算之前，一次在乘法运算之后：由于标准并未对这类运算规定顺序，所以有些编译器得<code>7*6</code>。而有些编 译器可能在乘法运算之前已经递增了x，所以<code>7*7</code>得49。</p>
+<p><strong>解决方法：</strong></p>
+<p>在替换体中使用圆括号使其得到符合预期的乘法运算，时要使用足够多的圆括号来确保运算和结合的正确顺序。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> SQUARE(X) ((X)*(X))</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h5 id="用宏参数创建字符串-运算符"><a href="#用宏参数创建字符串-运算符" class="headerlink" title="用宏参数创建字符串: #运算符"></a>用宏参数创建字符串: #运算符</h5><p>预处理器不会替换双引号字符串中宏，但是有时候我们需要实现这样的功能，就可以使用预处理运算符<code>#</code>。<code>#</code>作为一个预处理运算符，可以把记号(token)转换成字符串。例如，如果x是一个宏形参，那 么#x就是转换为字符串”x”的形参名。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> PSQR(X) printf(<span class="meta-string">"The square of "</span>#X<span class="meta-string">" is %d\n"</span>, ((X)*(X)))</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> y = <span class="number">5</span>;</span><br><span class="line">    PSQR(y);</span><br><span class="line">    PSQR(<span class="number">2</span> + <span class="number">4</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">The square of y is 25</span></span><br><span class="line"><span class="comment">The square of 2 + 4 is 36</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<p>调用第1个宏时，用<code>&quot;y&quot;</code>替换<code>#x</code>。调用第2个宏时，用<code>&quot;2 + 4&quot;</code>替换<code>#x</code>。 ANSI C字符串的串联特性将这些字符串与printf()语句的其他字符串组合，生成最终的字符串。例如，第1次调用变成：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">printf</span>(<span class="string">"The square of "</span><span class="string">"y"</span><span class="string">" is %d\n"</span>, ((y)*(y))))</span><br></pre></td></tr></table></figure>
+
+<p>然后，字符串串联功能将这3个相邻的字符串组合成一个字符串：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">printf</span>(<span class="string">"The square of y is %d\n"</span>, ((y)*(y))));</span><br></pre></td></tr></table></figure>
+
+
+
+<h5 id="预处理器黏合剂-运算符"><a href="#预处理器黏合剂-运算符" class="headerlink" title="预处理器黏合剂: ##运算符"></a>预处理器黏合剂: ##运算符</h5><p>与#运算符类似，##运算符可用于类函数宏的替换部分。而且，##还可用于对象宏的替换部分。##运算符把两个记号组合成一个记号。例如，可以这样做：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> XNAME(n) x##n</span></span><br></pre></td></tr></table></figure>
+
+<p>然后，宏XNAME(4)将展开为x4。下面是更多例子</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> XNAME(n) x ## n</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> PRINT_XN(n) printf(<span class="meta-string">"x"</span> #n <span class="meta-string">" = %d\n"</span>, x ## n)</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">XNAME</span><span class="params">(<span class="number">1</span>)</span> </span>= <span class="number">14</span>;</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">XNAME</span><span class="params">(<span class="number">2</span>)</span> </span>= <span class="number">20</span>;</span><br><span class="line">    <span class="keyword">int</span> x3 = <span class="number">30</span>;</span><br><span class="line">    PRINT_XN(<span class="number">1</span>);</span><br><span class="line">    PRINT_XN(<span class="number">2</span>);</span><br><span class="line">    PRINT_XN(<span class="number">3</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">x1 = 14</span></span><br><span class="line"><span class="comment">x2 = 20</span></span><br><span class="line"><span class="comment">x3 = 30</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<p>PRINT_XN()宏用#运算符组合字符串，##运算符把记号组合为一个标识符。</p>
+<h5 id="变参宏：-和-VA-ARGS"><a href="#变参宏：-和-VA-ARGS" class="headerlink" title="变参宏：...和__VA_ARGS__"></a>变参宏：<code>...</code>和<code>__VA_ARGS__</code></h5><p>一些函数，如 printf()接受数量可变的参数。stdvar.h 头文件提供了工具，让用户自定义带可变参数的函数。在类函数宏中，也可以实现这一功能。</p>
+<p>通过把宏参数列表中最后的参数写成省略号（即，3个点<code>...</code>）来实现这 一功能。这样，预定义宏<code>__VA_ARGS__</code>可用在替换部分中，表面省略号代表了什么，比如以下定义</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> PR(...) printf(__VA_ARGS__)</span></span><br><span class="line"></span><br><span class="line">PR(<span class="string">"Howdy"</span>);</span><br><span class="line">PR(<span class="string">"weight = %d, shipping = $%.2f\n"</span>, wt, sp);</span><br></pre></td></tr></table></figure>
+
+<p>对于第1次调用，<code>_ _VA_ARGS_ _</code>展开为1个参数：<code>&quot;Howdy&quot;</code>。</p>
+<p>对于第2次调用，<code>_ _VA_ARGS_ _</code>展开为3个参数：<code>&quot;weight shipping = $%.2f\n&quot;</code>、<code>wt</code>、<code>sp</code>。</p>
+<p>宏展开后的代码为</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">printf</span>(<span class="string">"Howdy"</span>);</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">"weight = %d, shipping = $%.2f\n"</span>, wt, sp);</span><br></pre></td></tr></table></figure>
+
+
+
+<h5 id="宏和函数的选择"><a href="#宏和函数的选择" class="headerlink" title="宏和函数的选择"></a>宏和函数的选择</h5><p>有些编程任务既可以用带参数的宏完成，也可以用函数完成。应该使用宏还是函数？</p>
+<p><strong>类函数宏</strong>：</p>
+<ul>
+<li><p>优点</p>
+<ul>
+<li>节省了函数和主调函数之间跳转的时间</li>
+<li>不用担心变量类型的问题，int和float都可以使用SQUARE(X)宏</li>
+</ul>
+</li>
+<li><p>缺点</p>
+<ul>
+<li>使用宏比使用普通函数复杂一些，稍有不慎会产生奇怪的副作用。一些编译器规定宏只能定义成一行。</li>
+<li>宏生成内联代码，即在程序中生成语句。如果调用20次宏，即在程序中插入20行代码。如果调用函数 20次，程序中只有一份函数语句的副本。所以宏占用更多空间</li>
+</ul>
+</li>
+</ul>
+<p>如果打算使用宏来加快程序的运行速度，那么首先要确定使用宏和使用函数是否会导致较大差异。在程序中只使用一次的宏无法明显减少程序的运行时间。在嵌套循环中使用宏更有助于提高效率。</p>
+<h3 id="include"><a href="#include" class="headerlink" title="#include"></a>#include</h3><p>当预处理器发现#include 指令时，会查看后面的文件名并把文件的内容包含到当前文件中，即替换源文件中的#include指令。这相当于把被包含文 件的全部内容输入到源文件#include指令所在的位置。#include指令有两种形式：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"myheader.h"</span></span></span><br></pre></td></tr></table></figure>
+
+<p>在 UNIX 系统中，<code>&lt;&gt;</code>告诉预处理器在标准系统目录中查找该文件。 <code>&quot;&quot;</code>告诉预处理器首先在当前目录中（或文件名中指定的其他目录）查找该文件，如果未找到再查找标准系统目录。</p>
+<p>集成开发环境（IDE）也有标准路径或系统头文件的路径。许多集成开发环境提供菜单选项，指定用尖括号时的查找路径。在 UNIX 中，使用双引号意味着先查找本地目录，但是具体查找哪个目录取决于编译器的设定。有些编译器会搜索源代码文件所在的目录，有些编译器则搜索当前的工作目 录，还有些搜索项目文件所在的目录。</p>
+<p><strong>包含一个大型头文件不一定显著增加程序的大小。在大部分情况下，头文件的内容是编译器生成最终代码时所需的信息，而不是添加到最终代码中 的材料。</strong></p>
+<h4 id="头文件"><a href="#头文件" class="headerlink" title="头文件"></a>头文件</h4><p><strong>头文件中最常用的形式和内容如下：</strong></p>
+<ul>
+<li>明示常量：#define定义的各种明示常量</li>
+<li>宏函数：如，getc(stdin)通常定义为getchar()。</li>
+<li>结构模型：如标准I/O使用的FILE结构，其中包含了文件和文件缓冲区的相关信息。</li>
+<li>类型定义：标准 I/O 函数使用指向 FILE 的指针作为参数。通常， stdio.h 用#define 或typedef把FILE定义为指向结构的指针。类似地，size_t和 time_t类型也定义在头文件中。</li>
+</ul>
+<p><strong>在多文件中共享变量</strong></p>
+<p>还可以使用头文件声明外部变量供其他文件共享。例如，如果已经开发了共享某个变量的一系列函数，该变量报告某种状况（如，错误情 况），这种方法就很有效。这种情况下，可以在包含这些函数声明的源代码文件定义一个文件作用域的外部链接变量：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> status = <span class="number">0</span>;    　<span class="comment">// 该变量具有文件作用域，在源代码文件</span></span><br></pre></td></tr></table></figure>
+
+<p>然后，可以在与源代码文件相关联的头文件中进行引用式声明：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">extern</span> <span class="keyword">int</span> status;  <span class="comment">// 在头文件中</span></span><br></pre></td></tr></table></figure>
+
+<p>这行代码会出现在包含了该头文件的文件中，这样使用该系列函数的文件都能使用这个变量。<strong>虽然源代码文件中包含该头文件后也包含了该声明， 但是只要声明的类型一致，在一个文件中同时使用定义式声明和引用式声明没问题。</strong></p>
+<p><strong>使用具有文件作用域、内部链接和const限定符的变量或数组</strong></p>
+<p>const 防止值被意外修改，static 意味着每个包含该头文件的文件都获得一份副本。因此，不需要在一个文件中进行定义式声明，在其他文件中进行引用式声明。</p>
+<h3 id="其他指令"><a href="#其他指令" class="headerlink" title="其他指令"></a>其他指令</h3><p>预处理器提供一些指令，程序员通过修改#define的值即可生成可移植的代码。#undef指令取消之前的#define定义。#if、#ifdef、 #ifndef、#else、#elif和#endif指令用于指定什么情况下编写哪些代码。#line 指令用于重置行和文件信息，#error指令用于给出错误消息，#pragma指令用 于向编译器发出指令。</p>
+<h4 id="undef"><a href="#undef" class="headerlink" title="#undef"></a>#undef</h4><p>#undef指令用于“取消”已定义的#define指令。也就是说，假设有如下定义：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> LIMIT 400</span></span><br></pre></td></tr></table></figure>
+
+<p>然后，下面的指令</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">undef</span> LIMIT</span></span><br></pre></td></tr></table></figure>
+
+<p>将移除上面的定义。现在就可以把LIMIT重新定义为一个新值。即使原 来没有定义LIMIT，取消LIMIT的定义仍然有效。如果想使用一个名称，又不确定之前是否已经用过，为安全起见，可以用#undef 指令取消该名字的定义。</p>
+<h4 id="预处理器定义"><a href="#预处理器定义" class="headerlink" title="预处理器定义"></a>预处理器定义</h4><p>当预处理器 在预处理器指令中发现一个标识符时，它会把该标识符当作已定义的或未定义的。这里的已定义表示由<strong>预处理器定义</strong>。如果标识符是同一个文件中由前面的#define指令创建的宏名，而且没有用#undef 指令关闭，那么该标识符是已定义的。如果标识符不是宏，假设是一个文件作用域的C变量，那么该标识符对预处理器而言就是未定义的。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> LIMIT 1000   <span class="comment">// LIMIT是已定义的</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> GOOD         <span class="comment">// GOOD是已定义的</span></span></span><br><span class="line"><span class="keyword">int</span> q;	             <span class="comment">// q不是宏，所以不算已经定义（预处理器定义）</span></span><br><span class="line"><span class="meta">#under GOOD          <span class="comment">// GOOD取消定义，从此开始GOOD是未定义的</span></span></span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="条件编译"><a href="#条件编译" class="headerlink" title="条件编译"></a>条件编译</h4><p>可以使用其他指令创建条件编译（conditinal compilation）。也就是说， 可以使用这些指令告诉编译器根据编译时的条件执行或忽略信息（或代码） 块。</p>
+<h5 id="ifdef、-else、-endif"><a href="#ifdef、-else、-endif" class="headerlink" title="#ifdef、#else、#endif"></a>#ifdef、#else、#endif</h5><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">ifdef</span> MAVIS</span></span><br><span class="line">	<span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"horse.h"</span></span></span><br><span class="line">	<span class="meta">#<span class="meta-keyword">define</span> STABLES 5</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">else</span></span></span><br><span class="line">	<span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"cow.h"</span></span></span><br><span class="line">	<span class="meta">#<span class="meta-keyword">define</span> STABLES 15</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+
+<p>#ifdef指令说明，如果预处理器已定义了后面的标识符（MAVIS），则执行#else或#endif指令之前的所有指令并编译所有C代码（先出现哪个指令就执行到哪里）。如果预处理器未定义MAVIS，且有#else指令，则执行 #else和#endif指令之间的所有代码。</p>
+<p>#ifdef #else很像的if else。两者的主要区别是，预处理器不识别用于标记块的花括号<code>{}</code>，因此它使用#else（如果需要）和#endif（必须存在） 来标记指令块。这些指令结构可以嵌套。也可以用这些指令标记C语句块，</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> JUST_CHECKING</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> LIMIT 4</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> i;</span><br><span class="line">    <span class="keyword">int</span> total = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; LIMIT; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        total += <span class="number">2</span> * i * i + <span class="number">1</span>;</span><br><span class="line">        <span class="meta">#<span class="meta-keyword">ifdef</span> JUST_CHECKING</span></span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">"i=%d, running total = %d\n"</span>, i, total);</span><br><span class="line">        <span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"Grand total = %d\n"</span>, total);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果省略JUST_CHECKING定义（把它放在C注释中，或者使用#undef指 令取消它的定义）并重新编译该程序，只会输出最后一行。</p>
+<p>可以用这种方法在调试程序。定义JUST_CHECKING并合理使用#ifdef，编译器将执行用于 试的程序代码，打印中间值。调试结束后，可移除JUST_CHECKING定义并重新编译。如果以后还需要使用这些信息，重新插入定义即可。这样做省去了再次输入额外打印语句的麻烦。#ifdef还可用于根据不同的C实现选择合适的代码块。</p>
+<h5 id="ifndef"><a href="#ifndef" class="headerlink" title="#ifndef"></a>#ifndef</h5><p>#ifndef指令与#ifdef指令的用法类似，也可以和#else、#endif一起使用， 但是它们的逻辑相反。</p>
+<p>通常，包含多个头文件时，其中的文件可能包含了相同宏定义。<strong>#ifndef 指令可以防止相同的宏被重复定义。在首次定义一个宏的头文件中用#ifndef 指令激活定义，随后在其他头文件中的定义都被忽略。</strong></p>
+<p>#ifndef指令通常用于防止多次包含一个文件(重复定义宏会报错)。也就是说，应该像下面这样设置头文件：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">ifndef</span> THINGS_H_</span></span><br><span class="line">	<span class="meta">#<span class="meta-keyword">define</span> THINGS_H_</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+
+<p>#ifndef还可以用来提供方便修改头文件中定义的方式，比如头文件”arrays.h”中定义了<code>#define SIZE 1000</code>。在调试的过程中，如果我们想修改SIZE，可以不用修改头文件，而像下面的代码这样：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* arrays.h*/</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifndef</span> SIZE</span></span><br><span class="line">	<span class="meta">#<span class="meta-keyword">define</span> SIZE 1000</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* source.c */</span></span><br><span class="line"><span class="meta"># <span class="meta-keyword">define</span> SIZE 10</span></span><br><span class="line"><span class="meta"># <span class="meta-keyword">include</span> <span class="meta-string">"arrays.h"</span></span></span><br></pre></td></tr></table></figure>
+
+<p>这样子，include “arrays.h”时预处理#ifndef发现SIZE已经被定义了，就不会重新定义。调试完成后，删去#define SIZE 10即可，避免了修改头文件。</p>
+<h5 id="if和-elif"><a href="#if和-elif" class="headerlink" title="#if和#elif"></a>#if和#elif</h5><p>#if指令很像C语言中的if。#if后面跟整型常量表达式，如果表达式为非零，则表达式为真。可以在指令中使用C的关系运算符和逻辑运算符：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">if</span> SYS == 1</span></span><br><span class="line">	<span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"ibm.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">elif</span> SYS == 2</span></span><br><span class="line">	<span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"vax.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">elif</span> SYS == 3</span></span><br><span class="line">	<span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"mac.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">else</span></span></span><br><span class="line">	<span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"general"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+
+<p>较新的编译器提供另一种方法测试名称是否已定义，即用#if (VAX)代替#ifdef VAX。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">if</span> defined (VAX)</span></span><br><span class="line">	<span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"ibcmp.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="预定义宏"><a href="#预定义宏" class="headerlink" title="预定义宏"></a>预定义宏</h4><table>
+<thead>
+<tr>
+<th>宏</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>__DATE__</code></td>
+<td>预处理的时期(“Mmm dd yyyy”)形式的字符串字面量，如 Nov 23 2019</td>
+</tr>
+<tr>
+<td><code>__FILE__</code></td>
+<td>当前源代码文件名的字符串字面量</td>
+</tr>
+<tr>
+<td><code>__LINE__</code></td>
+<td>当前源代码文件中行号的整型常量</td>
+</tr>
+<tr>
+<td><code>__STDC__</code></td>
+<td>设置为1时，表面是implementation遵循C标准</td>
+</tr>
+<tr>
+<td><code>__STDC_VERSION__</code></td>
+<td>支持C99标准，设置为19901L；支持C11，设置为201112L</td>
+</tr>
+<tr>
+<td><code>__STDC_HOSTED__</code></td>
+<td>本机环境设置为1；否则为0</td>
+</tr>
+<tr>
+<td><code>__TIME__</code></td>
+<td>翻译代码的时间，格式为“hh:mm:ss”</td>
+</tr>
+</tbody></table>
+<p>C99 标准提供一个名为<code>_ _func_ _</code>的预定义标识符，它展开为一个代表函数名的字符串（该函数包含该标识符）。那么，<code>_ _func_ _</code>必须具有函数作用域，而从本质上看宏具有文件作用域。因此，<code>_ _func_ _</code>是C语言的预定义标识符，而不是预定义宏。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* predef.c */</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">why_me</span><span class="params">(<span class="keyword">void</span>)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"This file is %s\n"</span>, __FILE__);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"The date is %s\n"</span>, __DATE__);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"The time is %s\n"</span>, __TIME__);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"The version is %ld\n"</span>, __STDC_VERSION__);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"This line is %d\n"</span>, __LINE__);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"This function is %s\n"</span>, __func__);</span><br><span class="line">    why_me();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">why_me</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"This function is %s\n"</span>, __func__);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"This line is %d\n"</span>, __LINE__);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">This file is predef.c</span></span><br><span class="line"><span class="comment">The date is Jun 13 2020</span></span><br><span class="line"><span class="comment">The time is 14:17:40</span></span><br><span class="line"><span class="comment">The version is 201112</span></span><br><span class="line"><span class="comment">This line is 10</span></span><br><span class="line"><span class="comment">This function is main</span></span><br><span class="line"><span class="comment">This function is why_me</span></span><br><span class="line"><span class="comment">This line is 20</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="line和-error"><a href="#line和-error" class="headerlink" title="#line和#error"></a>#line和#error</h4><p>#line指令重置<code>_ _LINE_ _</code>和<code>_ _FILE_ _</code>宏报告的行号和文件名。可以这样使用#line：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">line</span> 1000            <span class="comment">// 把当前行号设置为1000</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">line</span> 1000 <span class="meta-string">"cool.c"</span>   <span class="comment">// 把当前行号设置为1000，文件名设置为“cool.c"</span></span></span><br></pre></td></tr></table></figure>
+
+<p>#error 指令让预处理器发出一条错误消息，该消息包含指令中的文本。 如果可能的话，编译过程应该中断。可以这样使用#error指令：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">if</span> __STDC_VERSION__ != 201112L</span></span><br><span class="line">	<span class="meta">#<span class="meta-keyword">error</span> Not C11</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+
+<p>如果编译器只支持旧标准，则会编译失败，如果支持C11标准，就能成功编译。</p>
+<h4 id="pragma"><a href="#pragma" class="headerlink" title="#pragma"></a>#pragma</h4><p>在现在的编译器中，可以通过命令行参数或IDE菜单修改编译器的一些 设置。#pragma把编译器指令放入源代码中。例如，在开发C99时，标准被称为C9X，可以使用下面的编译指示（pragma）让编译器支持C9X：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">pragma</span> c9x on</span></span><br></pre></td></tr></table></figure>
+
+<p>C99还提供_Pragma预处理器运算符，该运算符把字符串转换成普通的编译指示。例如：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">_Pragma(<span class="string">"nonstandardtreatmenttypeB on"</span>)</span><br></pre></td></tr></table></figure>
+
+<p>等价于</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">pragma</span> nonstandardtreatmenttypeB on</span></span><br></pre></td></tr></table></figure>
+
+<p>由于该运算符不使用#符号，所以可以把它作为宏展开的一部分：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> PRAGMA(X) <span class="meta-keyword">_Pragma</span>(#X)</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="泛型选择-C11"><a href="#泛型选择-C11" class="headerlink" title="泛型选择(C11)"></a>泛型选择(C11)</h4><p>在程序设计中，泛型编程（generic programming）指那些没有特定类型，但是一旦指定一种类型，就可以转换成指定类型的代码。例如，C++在 模板中可以创建泛型算法，然后编译器根据指定的类型自动使用实例化代码。C没有这种功能。然而，C11新增了一种表达式，叫作泛型选择表达式 （generic selection expression），可根据表达式的类型（即表达式的类型是 int、double 还是其他类型）选择一个值。泛型选择表达式不是预处理器指令，但是在一些泛型编程中它常用作#define宏定义的一部分。</p>
+<p>下面是泛型表达式的例子</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">_Generic(x, int: 0, float: 1, double: 2, default:3)</span><br></pre></td></tr></table></figure>
+
+<p><code>_Generic</code>是C11的关键字。<code>_Generic</code>后面的圆括号中包含多个用逗号分隔的项。第1个项是一个表达式，后面的每个项都由一个类型、一个冒号和一个值组成，如float: 1。第1个项的类型匹配哪个标签，整个表达式的值是该 标签后面的值。例如，假设上面表达式中x是int类型的变量，x的类型匹配 int:标签，那么整个表达式的值就是0。如果没有与类型匹配的标签，表达式 的值就是default:标签后面的值。</p>
+<p>下面是一个把泛型选择语句和宏定义组合的例子：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> MYTYPE(X) _Generic((X), int: <span class="meta-string">"int"</span>, float: <span class="meta-string">"float"</span>, double: <span class="meta-string">"double"</span>, default: <span class="meta-string">"other"</span>)</span></span><br><span class="line"></span><br><span class="line">MYTYPE(<span class="number">5</span>)    <span class="comment">// “int"</span></span><br></pre></td></tr></table></figure>
+
+<p>对一个泛型选择表达式求值时，程序不会先对第一个项求值，它只确定类型。只有匹配标签的类型后才会对表达式求值。</p>
+<h3 id="内联-inline-函数-C99"><a href="#内联-inline-函数-C99" class="headerlink" title="内联(inline)函数(C99)"></a>内联(inline)函数(C99)</h3><p>通常，函数调用都有一定的开销，因为函数的调用过程包括建立调用、 传递参数、跳转到函数代码并返回。使用宏使代码内联，可以避免这样的开销。C99还提供另一种方法：内联函数（inline function）。C99和C11标准中叙述的是：“把函数变成内联函数表明该函数的调用会达到尽可能快的速度，其具体效果由implementation定义”。因此，把函数变成内联函数，编译器可能会用内联代码替换函数调用，并（或）执行一些其他的优化，但是也可能不起作用。</p>
+<p>创建内联函数的定义有多种方法。<strong>标准规定具有内部链接的函数可以成为内联函数，还规定了内联函数的定义与调用该函数的代码必须在同一个文 件中。因此，最简单的方法是使用函数说明符 inline 和存储类别说明符 static</strong>。通常，内联函数应定义在首次使用它的文件中，所以内联函数也相当于函数原型。如下所示：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">inline</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">eatline</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">while</span> (getchar() != <span class="string">'\n'</span>)</span><br><span class="line">    <span class="keyword">continue</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  ...</span><br><span class="line">  eatline();</span><br><span class="line">  ...</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>编译器查看内联函数的定义（也是原型），可能会用函数体中的代码替换 eatline()函数调用。也就是说，效果相当于在函数调用的位置输入函数体中的代码：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">inline</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">eatline</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">while</span> (getchar() != <span class="string">'\n'</span>)</span><br><span class="line">    <span class="keyword">continue</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  ...</span><br><span class="line">  <span class="keyword">while</span> (getchar() != <span class="string">'\n'</span>)</span><br><span class="line">    <span class="keyword">continue</span>;</span><br><span class="line">  ...</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>由于并未给内联函数预留单独的代码块，所以无法获得内联函数的地址</strong>。另外，内联函数无法在调试器中显示。内联函数应该比较短小。把较长的函数变成内联并未节约多少时间，因为执行函数体的时间比调用函数的时间长得多。</p>
+<p><strong>编译器优化内联函数必须知道该函数定义的内容。这意味着内联函数定义与函数调用必须在同一个文件中</strong>。鉴于此，一般情况下内联函数都具有内部链接。因此，如果程序有多个文件都要使用某个内联函数，那么这些文件 中都必须包含该内联函数的定义。最简单的做法是，把内联函数定义放入头文件，并在使用该内联函数的文件中包含该头文件即可。</p>
+<p><strong>与C++不同的是，C还允许混合使用内联函数定义和外部函数定义（具有外部链接的函数定义）</strong>。例如，一个程序中使用下面3个文件：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//file1.c ...</span></span><br><span class="line"><span class="function"><span class="keyword">inline</span> <span class="keyword">static</span> <span class="keyword">double</span> <span class="title">square</span><span class="params">(<span class="keyword">double</span>)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">double</span> <span class="title">square</span><span class="params">(<span class="keyword">double</span> x)</span> </span>&#123; <span class="keyword">return</span> x * x; &#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123; </span><br><span class="line">  <span class="keyword">double</span> q = square(<span class="number">1.3</span>);</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//file2.c ...</span></span><br><span class="line"><span class="function"><span class="keyword">double</span> <span class="title">square</span><span class="params">(<span class="keyword">double</span> x)</span> </span>&#123; <span class="keyword">return</span> (<span class="keyword">int</span>) (x*x); &#125; </span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">spam</span><span class="params">(<span class="keyword">double</span> v)</span> </span></span><br><span class="line"><span class="function"></span>&#123; <span class="keyword">double</span> kv = square(v);</span><br><span class="line">	...                  </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//file3.c</span></span><br><span class="line"><span class="function"><span class="keyword">inline</span> <span class="keyword">double</span> <span class="title">square</span><span class="params">(<span class="keyword">double</span> x)</span> </span>&#123; <span class="keyword">return</span> (<span class="keyword">int</span>) (x * x + <span class="number">0.5</span>); &#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">masp</span><span class="params">(<span class="keyword">double</span> w)</span> </span></span><br><span class="line"><span class="function"></span>&#123; <span class="keyword">double</span> kw = square(w);</span><br><span class="line">	...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如上述代码所示，3个文件中都定义了square()函数。file1.c文件中是 inline static定义；file2.c 文件中是普通的函数定义（因此具有外部链接）； file3.c 文件中是 inline 定义，省略了static。</p>
+<ul>
+<li><p>file1.c 文件中的main()使用square()的局部static定义。由于该定义也是inline定义， 所以编译器有可能优化代码，也许会内联该函数。</p>
+</li>
+<li><p>file2.c 文件中，spam()函 数使用该文件中 square()函数的定义，该定义具有外部链接，其他文件也可见</p>
+</li>
+<li><p>file3.c 文件中，编译器既可以使用该文件中square()函数的内联定义，也可以使用file2.c文件中的外部链接定义。如果像file3.c那样，省略file1.c文件 inline定义中的static，那么该inline定义被视为可替换的外部定义。</p>
+</li>
+</ul>
+<h3 id="Noreturn函数-C11"><a href="#Noreturn函数-C11" class="headerlink" title="_Noreturn函数(C11)"></a>_Noreturn函数(C11)</h3><p>C11新增了函数说明符_Noreturn，表明调用完成后函数不返回主调函数。exit()函数是 _Noreturn 函数的一个示例，一旦调用exit()，它不会再返回主调函数。注意，这与void返回类型不同。void类型的函数在执行完毕后返回主调函数，只是它不提供返回值。</p>
+<p>_Noreturn的目的是告诉用户和编译器，这个特殊的函数不会把控制返回 主调程序。告诉用户以免滥用该函数，通知编译器可优化一些代码。</p>
+<h2 id="C库"><a href="#C库" class="headerlink" title="C库"></a>C库</h2><p>如何访问C库取决于实现，因此你要了解当前系统的一般情况。首先，可以在多个不同的位置找到库函数。例如，getchar()函数通常作为宏定义在 stdio.h头文件中，而strlen()通常在库文件中。其次，不同的系统搜索这些函数的方法不同。下面介绍3种可能的方法。</p>
+<ul>
+<li>自动访问：在一些系统中，只需编译程序，就可使用一些常用的库函数。记住，在使用函数之前必须先声明函数的类型，通过包含合适的头文件即可完成。</li>
+<li>文件包含：如果函数被定义为宏，那么可以通过#include 指令包含定义宏函数的文 件。通常，类似的宏都放在合适名称的头文件中。</li>
+<li>库包含：在编译或链接程序的某些阶段，可能需要指定库选项。即使在自动检查 标准库的系统中，也会有不常用的函数库。必须通过编译时选项显式指定这 些库。注意，这个过程与包含头文件不同。头文件提供函数声明或原型，而 库选项告诉系统到哪里查找函数代码</li>
+</ul>
+<h3 id="通用工具库-stdlib-h"><a href="#通用工具库-stdlib-h" class="headerlink" title="通用工具库(stdlib.h)"></a>通用工具库(stdlib.h)</h3><p>通用工具库包含各种函数，包括随机数生成器、查找和排序函数、转换函数和内存管理函数。如，rand()、srand()、malloc()和free()函数。 在ANSI C标准中，这些函数的原型都在stdlib.h头文件中。</p>
+<h4 id="exit-和atexit"><a href="#exit-和atexit" class="headerlink" title="exit()和atexit()"></a>exit()和atexit()</h4><ul>
+<li><p>exit()函数执行会结束程序，<strong>在 main()返回系统时将自动调用exit()函数。</strong>根据ANSI C标准规定，在<strong>最初调用(非递归调用)</strong>的main()中使用return与调用exit()的效果相同。要注意，如果main()在一个递归程序中，exit()仍然会终止程序，但是return只会把控制权交给上一级递归，直至最初的一级。然后return结束程序。return和exit()的另一个区别是，即使在其他函数中（除main()以外）调用exit()也能结束整个程序。</p>
+</li>
+<li><p>atexit()函数的参数为一个函数指针，使用atexit()函数会将函数指针指向的函数注册到列表中，当exit()被调用时就会执行这个列表中的函数。ANSI保证，在这个列表中至少可以放 32 个函数。最后调用 exit()函数时，exit()会执行这些函数（<strong>执行顺序与列表中的函数顺序相反，即最后添加的函数最先执行</strong>）。atexit()注册的函数应该不带任何参数且返回类型为void。通常，这些函数执行一些清理任务，例如更新监视程序的文件或重置环境变量。</p>
+</li>
+</ul>
+<p>exit()执行完atexit()指定的函数后，会完成一些清理工作：刷新所有输出流、关闭所有打开的流和关闭由标准I/O函数tmpfile()创建的临时文件。然后 exit()把控制权返回主机环境，如果可能的话，向主机环境报告终止状态。 通常，UNIX程序使用0表示成功终止，用非零值表示终止失败。UNIX返回的代码并不适用于所有的系统，所以ANSI C为了可移植性的要求，定义了一个名为EXIT_FAILURE的宏表示终止失败。类似地，ANSI C还定义了 EXIT_SUCCESS表示成功终止。不过，exit()函数也接受0表示成功终止。</p>
+<h4 id="qsort-函数"><a href="#qsort-函数" class="headerlink" title="qsort()函数"></a>qsort()函数</h4><p>函数原型</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">qsort</span><span class="params">(<span class="keyword">void</span> *base, <span class="keyword">size_t</span> nmemb, <span class="keyword">size_t</span> <span class="built_in">size</span>, <span class="keyword">int</span> (*compar)(<span class="keyword">const</span> <span class="keyword">void</span> *, <span class="keyword">const</span> <span class="keyword">void</span> *))</span></span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>参数1：指向待排序数组的首元素的指针。ANSI C允许把指向任何数据类型的指针强制转换成指向void的指针，因此，qsort()的第1个实际参数可以引用任何类型的数组；</li>
+<li>参数2：待排序项的数量，函数原型把该值转换为size_t类型；</li>
+<li>参数3：数组中每个元素的大小，常用sizeof获取；</li>
+<li>参数4：指向函数的指针，这个被指针指向的比较函数用于确定排序的顺序。该函数应接受两个参数：分别指向待比较两项的指针。如果第1项的值大于第2项，比较函数则返回正数；如果两项相同，则返回0；如果第1项的值小于第2项，则返回负数。qsort()根据给定的其他信息 计算出两个指针的值，然后把它们传递给比较函数。</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">comp</span><span class="params">(<span class="keyword">const</span> <span class="keyword">void</span> *p1, <span class="keyword">const</span> <span class="keyword">void</span> *p2)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> data[<span class="number">100</span>] = &#123;<span class="number">1</span>,<span class="number">3</span>,<span class="number">13</span>,<span class="number">6.</span>.....<span class="number">.100</span>&#125;;</span><br><span class="line">  	qsort(data, <span class="number">100</span>, <span class="keyword">sizeof</span>(<span class="keyword">int</span>), comp);</span><br><span class="line">		<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">comp</span><span class="params">(<span class="keyword">const</span> <span class="keyword">void</span> *p1, <span class="keyword">const</span> <span class="keyword">void</span> *p2)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">int</span> *a1 = (<span class="keyword">const</span> <span class="keyword">int</span> *)p1;</span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">int</span> *a2 = (<span class="keyword">const</span> <span class="keyword">int</span> *)p2;</span><br><span class="line">    <span class="keyword">if</span> (*a1 &gt; *a2)</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (*a1 == *a2)</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="断言库"><a href="#断言库" class="headerlink" title="断言库"></a>断言库</h3><p>assert.h 头文件支持的断言库是一个用于辅助调试程序的小型库。它由 assert()宏组成，接受一个整型表达式作为参数。如果表达式求值为假（非零），assert()宏就在标准错误流（stderr）中写入一条错误信息，并调用 abort()函数终止程序（abort()函数的原型在stdlib.h头文件中）</p>
+<h4 id="assert"><a href="#assert" class="headerlink" title="assert()"></a>assert()</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;math.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;assert.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">double</span> x, y, z;</span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">"Enter a pair of numbers (0 0 to quit)"</span>);</span><br><span class="line">    <span class="keyword">while</span> (<span class="built_in">scanf</span>(<span class="string">"%lf %lf"</span>, &amp;x, &amp;y) == <span class="number">2</span> &amp;&amp; (x!=<span class="number">0</span> || y != <span class="number">0</span>))</span><br><span class="line">    &#123;</span><br><span class="line">        z = x * x - y * y;</span><br><span class="line">        assert(z &gt;= <span class="number">0</span>);</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"Anser is %f\n"</span>, <span class="built_in">sqrt</span>(z));</span><br><span class="line">        <span class="built_in">puts</span>(<span class="string">"Next pair of numbers."</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">"Done."</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">Enter a pair of numbers (0 0 to quit)</span></span><br><span class="line"><span class="comment">4 3</span></span><br><span class="line"><span class="comment">Anser is 2.645751</span></span><br><span class="line"><span class="comment">Next pair of numbers.</span></span><br><span class="line"><span class="comment">3 4</span></span><br><span class="line"><span class="comment">Assertion failed: (z &gt;= 0), function main, file assert.c, line 12.</span></span><br><span class="line"><span class="comment">[1]    44103 abort  </span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<p>如果认为已经排除了程序的 bug，就可以把下面的宏定义写在包含assert.h的位置前面：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> NDEBUG</span></span><br></pre></td></tr></table></figure>
+
+<p>并重新编译程序，这样编译器就会禁用文件中的所有 assert()语句。如 果程序又出现问题，可以移除这条#define指令（或者把它注释掉），然后重 新编译程序，这样就重新启用了assert()语句。</p>
+<h4 id="Static-assert-C11"><a href="#Static-assert-C11" class="headerlink" title="_Static_assert (C11)"></a>_Static_assert (C11)</h4><p>assert()表达式是在运行时进行检查。C11新增了一个特性：<code>_Static_assert</code>声明，可以在编译时检查assert()表达式。因此，assert()可以导 致正在运行的程序中止，而<code>_Static_assert()</code>可以导致程序无法通过编译。</p>
+<ul>
+<li>参数1：整型常量表达式，判断条件</li>
+<li>参数2：一个字符串，错误信息</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//　statasrt.c </span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt; </span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;limits.h&gt; </span></span></span><br><span class="line"></span><br><span class="line">_Static_assert(CHAR_BIT == <span class="number">16</span>, <span class="string">"16-bit char falsely assumed"</span>); </span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span> </span></span><br><span class="line"><span class="function"></span>&#123; </span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">"char is 16 bits."</span>); </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>; </span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">assert.c:6:1: error: static_assert failed due to requirement '8 == 16' "16-bit char falsely assumed"</span></span><br><span class="line"><span class="comment">_Static_assert(CHAR_BIT == 16, "16-bit char falsely assumed"); </span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<p><code>_Static_assert</code>要求它的第1个参数是<strong>整型常量表达式，这保证了能在编译期求值（sizeof表达式被视为整型常量）</strong>，不可以使用变量，因为表量在程序运行过程中才会求值。</p>
+<h3 id="string-h库的memcpy和memmove"><a href="#string-h库的memcpy和memmove" class="headerlink" title="string.h库的memcpy和memmove()"></a>string.h库的memcpy和memmove()</h3><p>不能把一个数组赋给另一个数组，所以要通过循环把数组中的每个元素 赋给另一个数组相应的元素。有一个例外的情况是：使用strcpy()和strncpy() 函数来处理字符数组。memcpy()和memmove()函数提供类似的方法处理任意类型的数组。下面是这两个函数的原型：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> *<span class="title">memcpy</span><span class="params">(<span class="keyword">void</span> * <span class="keyword">restrict</span> s1, <span class="keyword">const</span> <span class="keyword">void</span> * <span class="keyword">restrict</span> s2, <span class="keyword">size_t</span> n)</span></span>; </span><br><span class="line"><span class="function"><span class="keyword">void</span> *<span class="title">memmove</span><span class="params">(<span class="keyword">void</span> *s1, <span class="keyword">const</span> <span class="keyword">void</span> *s2, <span class="keyword">size_t</span> n)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>这两个函数都从 s2 指向的位置拷贝 n 字节到 s1 指向的位置，而且都返回 s1 的值。所不同的是， memcpy()的参数带关键字restrict，即<strong>memcpy()假设两个内存区域之间没有重叠；而memmove()不作这样的假设，所以拷贝过程类似于先把所有字节拷贝到一个临时缓冲区，然后再拷贝到最终目的地</strong>。 如果使用 memcpy()时，两区域出现重叠会怎样？其行为是未定义的，这意 味着该函数可能正常工作，也可能失败。</p>
+<p>由于这两个函数设计用于处理任何数据类型，所有它们的参数都是两个 指向 void 的指针。C 允许把任何类型的指针赋给<code>void *</code>类型的指针。如此宽容导致函数无法知道待拷贝数据的类型。因此，这两个函数使用第 3 个参数指明待拷贝的字节数。注意，对数组而言，字节数一般与元素个数不同。如果要拷贝数组中10个double类型的元素，要使用10*sizeof(double)，而不是10。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> SIZE 10</span></span><br><span class="line">_Static_assert(<span class="keyword">sizeof</span>(<span class="keyword">double</span>) == <span class="number">2</span> * <span class="keyword">sizeof</span>(<span class="keyword">int</span>), <span class="string">"double not twice int"</span>);</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">show_array</span><span class="params">(<span class="keyword">const</span> <span class="keyword">int</span> ar[], <span class="keyword">int</span> n)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> values[SIZE] = &#123;<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>,<span class="number">7</span>,<span class="number">8</span>,<span class="number">9</span>,<span class="number">10</span>&#125;;</span><br><span class="line">    <span class="keyword">int</span> target[SIZE];</span><br><span class="line">    <span class="keyword">double</span> curious[SIZE/<span class="number">2</span>] = &#123;<span class="number">2.0</span>, <span class="number">3.0</span>, <span class="number">4.0</span>, <span class="number">5.0</span>, <span class="number">6.0</span>&#125;;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">"memcpy() used:"</span>);</span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">"values (original data): "</span>);</span><br><span class="line">    show_array(values, SIZE);</span><br><span class="line">    <span class="built_in">memcpy</span>(target, values, SIZE * <span class="keyword">sizeof</span>(<span class="keyword">int</span>));</span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">"target (copy of values):"</span>);</span><br><span class="line">    show_array(target, SIZE);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">"\nUsing memove() with overlapping ranges:"</span>);</span><br><span class="line">    memmove(values + <span class="number">2</span>, values, <span class="number">5</span> * <span class="keyword">sizeof</span>(<span class="keyword">int</span>));</span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">"values -- elements 0-5 copied to 2-7:"</span>);</span><br><span class="line">    show_array(values, SIZE);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">"\nUsing memcpy() to copy double to int:"</span>); </span><br><span class="line">    <span class="built_in">memcpy</span>(target, curious, (SIZE / <span class="number">2</span>) * <span class="keyword">sizeof</span>(<span class="keyword">double</span>)); </span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">"target -- 5 doubles into 10 int positions:"</span>); </span><br><span class="line">    show_array(target, SIZE / <span class="number">2</span>); </span><br><span class="line">    show_array(target + <span class="number">5</span>, SIZE / <span class="number">2</span>);</span><br><span class="line">  </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">show_array</span><span class="params">(<span class="keyword">const</span> <span class="keyword">int</span> ar[], <span class="keyword">int</span> n)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> i;</span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; n; i++)</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"%d"</span>, ar[i]);</span><br><span class="line">    <span class="built_in">putchar</span>(<span class="string">'\n'</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">memcpy() used:</span></span><br><span class="line"><span class="comment">values (original data): </span></span><br><span class="line"><span class="comment">1 2 3 4 5 6 7 8 9 10 </span></span><br><span class="line"><span class="comment">target (copy of values):</span></span><br><span class="line"><span class="comment">1 2 3 4 5 6 7 8 9 10 </span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">Using memove() with overlapping ranges:</span></span><br><span class="line"><span class="comment">values -- elements 0-5 copied to 2-7:</span></span><br><span class="line"><span class="comment">1 2 1 2 3 4 5 8 9 10 </span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">Using memcpy() to copy double to int:</span></span><br><span class="line"><span class="comment">target -- 5 doubles into 10 int positions:</span></span><br><span class="line"><span class="comment">0 1073741824 0 1074266112 0 </span></span><br><span class="line"><span class="comment">1074790400 0 1075052544 0 1075314688 </span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<p>程序中最后一次调用 memcpy()从 double 类型数组中把数据拷贝到 int 类型数组中，这演示了memcpy()函数不知道也不关心数据的类型，它只负责从一个位置把一些字节拷贝到另一个位置（例如，从结构中拷贝数据到字符数组中）。而且，拷贝过程中也不会进行数据转换。如果用循环对数组中的每 个元素赋值，double类型的值会在赋值过程被转换为int类型的值。这种情况下，按原样拷贝字节，然后程序把这些位组合解释成int类型。</p>
+<h3 id="可变参数stdarg-h"><a href="#可变参数stdarg-h" class="headerlink" title="可变参数stdarg.h"></a>可变参数stdarg.h</h3><p>stdarg.h 头文件为函数提供了一个使用可变数量参数的功能，但是用法比较复杂。必须按如下步骤进行：</p>
+<ol>
+<li><p>提供一个使用省略号(…)的函数原型，至少有一个形参和一个省略号，省略号必须在最后</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">f1</span><span class="params">(<span class="keyword">int</span> n, ...)</span></span>;　　              <span class="comment">// 有效</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">f2</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *s, <span class="keyword">int</span> k, ...)</span></span>;   <span class="comment">// 有效</span></span><br><span class="line"><span class="function"><span class="keyword">char</span> <span class="title">f3</span><span class="params">(<span class="keyword">char</span> c1,..., <span class="keyword">char</span> c2)</span></span>;       <span class="comment">// 无效</span></span><br><span class="line"><span class="function"><span class="keyword">double</span> <span class="title">f4</span><span class="params">(...)</span></span>;                      <span class="comment">// 无效</span></span><br></pre></td></tr></table></figure>
+
+<p>最右边的形参（即省略号的前一个形参）起着特殊的作用，标准中用<code>parmN</code>这个术语来描述该形参。在上面的例子中，第1行f1()中parmN为n，第 2行f2()中parmN为k。传递给该形参的实际参数是省略号部分代表的参数数量。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">f1(<span class="number">2</span>, <span class="number">200</span>, <span class="number">400</span>);        <span class="comment">// 2个额外参数</span></span><br><span class="line">f1(<span class="number">4</span>, <span class="number">13</span>, <span class="number">14</span>, <span class="number">14</span>, <span class="number">15</span>);  <span class="comment">// 4个额外参数</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>在函数定义中创建一个va_list类型的变量；</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">double</span> <span class="title">sum</span><span class="params">(<span class="keyword">int</span> lim, ...)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  va_list ap;        <span class="comment">// 声明一个储存参数的对象</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在该例中，lim是parmN形参，它表明变参列表中参数的数量。</p>
+</li>
+<li><p>用宏把该变量初始化为一个参数列表；</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">va_start(ap, lim);  <span class="comment">// 把ap初始化为参数列表</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>用宏访问参数列表，使用宏va_arg()。该宏接受两个参数：<strong>一个va_list类型的变量和一个类型名</strong>。第1次调用va_arg()时， 它返回参数列表的第1项；第2次调用时返回第2项，以此类推。表示类型的参数指定了返回值的类型。例如，如果参数列表中的第1个参数是double类 型，第2个参数是int类型，可以这样做：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">double</span> tic;</span><br><span class="line"><span class="keyword">int</span> toc;</span><br><span class="line">tic = va_arg(ap, <span class="keyword">double</span>);    <span class="comment">// 获得第一个参数</span></span><br><span class="line">toc = va_arg(ap, <span class="keyword">int</span>);       <span class="comment">// 获得第二个参数</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>注意，传入的参数类型必须与宏参数的类型相匹配，否则会出错</strong></p>
+<ol>
+<li>用宏完成清理工作，使用va_end()宏完成清理工作。调用va_end(ap)后，只有用va_start重新初始化ap后，才能使用变量ap。</li>
+</ol>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">va_end(ap);</span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ol>
+<p>因为va_arg()不提供退回之前参数的方法，所以有必要保存va_list类型 变量的副本。C99新增了一个宏用于处理这种情况：va_copy()。该宏接受两 个va_list类型的变量作为参数，它把第2个参数拷贝给第1个参数：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">va_list ap;</span><br><span class="line">va_list apcopy;</span><br><span class="line">va_start(ap, lim);</span><br><span class="line">va_copy(apcopy, ap);</span><br><span class="line"></span><br><span class="line">tic = va_arg(ap, <span class="keyword">double</span>);</span><br><span class="line">toc = va_arg(ap, <span class="keyword">int</span>);</span><br></pre></td></tr></table></figure>
+
+<p>此时，即使删除了ap，也可以从apcopy中检索两个参数。</p>
+<p><strong>例子</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdarg.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">double</span> <span class="title">sum</span><span class="params">(<span class="keyword">int</span>, ...)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">double</span> s,t;</span><br><span class="line"></span><br><span class="line">    s = sum(<span class="number">3</span>, <span class="number">1.1</span>, <span class="number">2.5</span>, <span class="number">13.3</span>);</span><br><span class="line">    t = sum(<span class="number">6</span>, <span class="number">1.1</span>, <span class="number">2.1</span>, <span class="number">13.1</span>, <span class="number">4.1</span>, <span class="number">5.1</span>, <span class="number">6.1</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"return value of sum(3, 1.1, 2.5, 13.3)                : %g\n"</span>, s);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"return value of sum(6, 1.1, 2.1, 13.1, 4.1, 5.1, 6.1) : %g\n"</span>, t);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">double</span> <span class="title">sum</span><span class="params">(<span class="keyword">int</span> n, ...)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    va_list ap;</span><br><span class="line">    va_start(ap, n);</span><br><span class="line">    <span class="keyword">int</span> i;</span><br><span class="line">    <span class="keyword">double</span> total = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; n; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        total += va_arg(ap, <span class="keyword">double</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    va_end(ap);</span><br><span class="line">    <span class="keyword">return</span> total;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">return value of sum(3, 1.1, 2.5, 13.3)                : 16.9</span></span><br><span class="line"><span class="comment">return value of sum(6, 1.1, 2.1, 13.1, 4.1, 5.1, 6.1) : 31.6</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/06/13/%E4%BD%8D%E8%BF%90%E7%AE%97/" rel="prev" title="位运算">
+      <i class="fa fa-chevron-left"></i> 位运算
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#C预处理器"><span class="nav-number">1.</span> <span class="nav-text">C预处理器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#翻译程序的第一步"><span class="nav-number">1.1.</span> <span class="nav-text">翻译程序的第一步</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#define"><span class="nav-number">1.2.</span> <span class="nav-text">#define</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#记号-token"><span class="nav-number">1.2.1.</span> <span class="nav-text">记号(token)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#在-define中使用参数"><span class="nav-number">1.2.2.</span> <span class="nav-text">在#define中使用参数</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#用宏参数创建字符串-运算符"><span class="nav-number">1.2.2.1.</span> <span class="nav-text">用宏参数创建字符串: #运算符</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#预处理器黏合剂-运算符"><span class="nav-number">1.2.2.2.</span> <span class="nav-text">预处理器黏合剂: ##运算符</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#变参宏：-和-VA-ARGS"><span class="nav-number">1.2.2.3.</span> <span class="nav-text">变参宏：...和__VA_ARGS__</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#宏和函数的选择"><span class="nav-number">1.2.2.4.</span> <span class="nav-text">宏和函数的选择</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#include"><span class="nav-number">1.3.</span> <span class="nav-text">#include</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#头文件"><span class="nav-number">1.3.1.</span> <span class="nav-text">头文件</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#其他指令"><span class="nav-number">1.4.</span> <span class="nav-text">其他指令</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#undef"><span class="nav-number">1.4.1.</span> <span class="nav-text">#undef</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#预处理器定义"><span class="nav-number">1.4.2.</span> <span class="nav-text">预处理器定义</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#条件编译"><span class="nav-number">1.4.3.</span> <span class="nav-text">条件编译</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#ifdef、-else、-endif"><span class="nav-number">1.4.3.1.</span> <span class="nav-text">#ifdef、#else、#endif</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#ifndef"><span class="nav-number">1.4.3.2.</span> <span class="nav-text">#ifndef</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#if和-elif"><span class="nav-number">1.4.3.3.</span> <span class="nav-text">#if和#elif</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#预定义宏"><span class="nav-number">1.4.4.</span> <span class="nav-text">预定义宏</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#line和-error"><span class="nav-number">1.4.5.</span> <span class="nav-text">#line和#error</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#pragma"><span class="nav-number">1.4.6.</span> <span class="nav-text">#pragma</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#泛型选择-C11"><span class="nav-number">1.4.7.</span> <span class="nav-text">泛型选择(C11)</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#内联-inline-函数-C99"><span class="nav-number">1.5.</span> <span class="nav-text">内联(inline)函数(C99)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Noreturn函数-C11"><span class="nav-number">1.6.</span> <span class="nav-text">_Noreturn函数(C11)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C库"><span class="nav-number">2.</span> <span class="nav-text">C库</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#通用工具库-stdlib-h"><span class="nav-number">2.1.</span> <span class="nav-text">通用工具库(stdlib.h)</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#exit-和atexit"><span class="nav-number">2.1.1.</span> <span class="nav-text">exit()和atexit()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#qsort-函数"><span class="nav-number">2.1.2.</span> <span class="nav-text">qsort()函数</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#断言库"><span class="nav-number">2.2.</span> <span class="nav-text">断言库</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#assert"><span class="nav-number">2.2.1.</span> <span class="nav-text">assert()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Static-assert-C11"><span class="nav-number">2.2.2.</span> <span class="nav-text">_Static_assert (C11)</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#string-h库的memcpy和memmove"><span class="nav-number">2.3.</span> <span class="nav-text">string.h库的memcpy和memmove()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#可变参数stdarg-h"><span class="nav-number">2.4.</span> <span class="nav-text">可变参数stdarg.h</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">崔梓坤</p>
+  <div class="site-description" itemprop="description">我的计算机学习经历和笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">15</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">崔梓坤</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

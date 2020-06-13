@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="二进制十进制转换整数部分 10进制数除2取余数至0，以十进制数13为例：$$13\div2&#x3D;6余1\6\div2&#x3D;3余0\3\div2&#x3D;1余1\1\div2&#x3D;0余1$$所以十进制数13转化为二进制数为1101（注意顺序，整数是从下到上） 小数部分 10进制数不断乘2取整数部分，部分小数无法用二进制精确表示，乘2取整无限不循环。以十进制数6.36为例：   截取十进制的6.36转化为二进制为（整数部">
+<meta property="og:type" content="article">
+<meta property="og:title" content="位运算">
+<meta property="og:url" content="http://yoursite.com/2020/06/13/%E4%BD%8D%E8%BF%90%E7%AE%97/index.html">
+<meta property="og:site_name" content="崔梓坤的个人博客">
+<meta property="og:description" content="二进制十进制转换整数部分 10进制数除2取余数至0，以十进制数13为例：$$13\div2&#x3D;6余1\6\div2&#x3D;3余0\3\div2&#x3D;1余1\1\div2&#x3D;0余1$$所以十进制数13转化为二进制数为1101（注意顺序，整数是从下到上） 小数部分 10进制数不断乘2取整数部分，部分小数无法用二进制精确表示，乘2取整无限不循环。以十进制数6.36为例：   截取十进制的6.36转化为二进制为（整数部">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://gitee.com/Carlisle345748/cloudimg/raw/master/img/10%E8%BF%9B%E5%88%B6%E5%B0%8F%E6%95%B0%E8%BD%AC2%E8%BF%9B%E5%88%B6.jpg">
+<meta property="article:published_time" content="2020-06-13T10:28:41.000Z">
+<meta property="article:modified_time" content="2020-06-13T10:29:08.513Z">
+<meta property="article:author" content="崔梓坤">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gitee.com/Carlisle345748/cloudimg/raw/master/img/10%E8%BF%9B%E5%88%B6%E5%B0%8F%E6%95%B0%E8%BD%AC2%E8%BF%9B%E5%88%B6.jpg">
+
+<link rel="canonical" href="http://yoursite.com/2020/06/13/%E4%BD%8D%E8%BF%90%E7%AE%97/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>位运算 | 崔梓坤的个人博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">崔梓坤的个人博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/06/13/%E4%BD%8D%E8%BF%90%E7%AE%97/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="崔梓坤">
+      <meta itemprop="description" content="我的计算机学习经历和笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="崔梓坤的个人博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          位运算
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-06-13 18:28:41 / 修改时间：18:29:08" itemprop="dateCreated datePublished" datetime="2020-06-13T18:28:41+08:00">2020-06-13</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="二进制"><a href="#二进制" class="headerlink" title="二进制"></a>二进制</h3><h4 id="十进制转换"><a href="#十进制转换" class="headerlink" title="十进制转换"></a>十进制转换</h4><p><strong>整数部分</strong></p>
+<p>10进制数除2取余数至0，以十进制数<code>13</code>为例：<br>$$<br>13\div2=6余1\<br>6\div2=3余0\<br>3\div2=1余1\<br>1\div2=0余1<br>$$<br>所以十进制数<code>13</code>转化为二进制数为<code>1101</code><strong>（注意顺序，整数是从下到上）</strong></p>
+<p><strong>小数部分</strong></p>
+<p>10进制数不断乘2取整数部分，部分小数无法用二进制精确表示，乘2取整无限不循环。以十进制数<code>6.36</code>为例：</p>
+<img src="https://gitee.com/Carlisle345748/cloudimg/raw/master/img/10进制小数转2进制.jpg" alt="10进制小数转2进制" style="zoom:50%;" />
+
+<p>截取十进制的6.36转化为二进制为<strong>（整数部分顺序从下到上，小数部分为从上到下）</strong>。<br>$$<br>110.010111000010100011110…<br>$$</p>
+<p>各种进制的转换可以使用<a href="http://www.binaryconvert.com/" target="_blank" rel="noopener">binaryconvert工具站</a></p>
+<h4 id="二进制补码-two’s-complement"><a href="#二进制补码-two’s-complement" class="headerlink" title="二进制补码 (two’s complement)"></a>二进制补码 (two’s complement)</h4><p>如何表示有符号整数取决于硬件，而不是C语言。也许表示有符号数最简单的方式是用1位（如，高阶位）储存符号，只剩下7位表示数字本身（假设储存在1字节中）。用这种符号量（sign-magnitude）表示法，<code>1000 0001</code>表 示−1，<code>0000 0001</code>表示1。因此，其表示范围是−127～+127。这种方法的缺点是有两个0：+0和-0。这很容易混淆，而且用两个位组合来表示一个值也有些浪费。二进制补码（two’s-complement）方法避免了这个问题，是当今最常用的系统。</p>
+<p>以1字节为例，二进制补码用1字节中的后7位表示0～127，高阶位设置为0。目前，这种方法和符号量的方法相同。另外，如果高阶位是1，表示的值为负。<strong>这两种方法的区别在于如何确定负值</strong>。从一个9位组合<code>1 0000 0000</code>（256的二进制形式）减去一个负数的位组合，结果是该负值的量<code>（1 0000 0000 - 后7位 = 负数的绝对值）</code>。例如，假设一个负值的位组合是 10000000，作为 一个无符号字节，该组合为表示 128，作为一个有符号值，该组合表示负值，值为<code>1 0000 0000 - 1000 0000 = 1000 0000(128)</code>，即该数为-128。</p>
+<ul>
+<li>正数：以<code>0101 0011</code>为例，高阶位0表示这是一个正数，后7位<code>101 0011</code>的10进制为83，所以该数字为83</li>
+<li>负数：以<code>1101 0011</code>为例，高阶位1表示这是一个负数，<code>1 0000 0000 - 1101 0011 = 10 1101</code>，<code>10 1101</code>的10进制为56，所以该数字为-45</li>
+</ul>
+<p>要得到一个<strong>二进制补码数的相反数</strong>，最简单的方法是反转每一位（即0 变为1，1变为0），然后加1。因为1是<code>0000 0001</code>，那么−1则是<code>1111 1110+1</code>， 或<code>1111 1111</code>。这与上面的介绍一致。</p>
+<h4 id="二进制反码-one’s-complement"><a href="#二进制反码-one’s-complement" class="headerlink" title="二进制反码 (one’s complement)"></a>二进制反码 (one’s complement)</h4><p>二进制反码（one’s-complement）方法通过反转位组合中的每一位形成 一个负数。例如，<code>0000 0001</code>是1，那么<code>1111 1110</code>是−1。这种方法也有一个 −0：<code>1111 1111</code>。该方法能表示-127～+127之间的数。</p>
+<h4 id="二进制截断"><a href="#二进制截断" class="headerlink" title="二进制截断"></a>二进制截断</h4><p>对于32bit的integer，在类型转换中被截断后，剩余的部分对应的十进制数为<code>原十进制数 % 2^剩余位数</code>。例如，十进制数<code>1107</code>储存为32bit的signed integer，二进制表示为<code>0000 0000 0000 0000 0000 0100 0101 0011</code>，截断为8bit的signed char后，剩余的位为<code>0101 0011</code>,对应的十进制数为<code>83</code>，<code>1107 % 2^8 = 83</code>。</p>
+<p>原理：<code>2^n</code>的二进制表示为1…(n个0)，比如<code>2^8</code>的二进制为<code>1 0000 0000</code>，所以任何数除以<code>2^8</code>的余数都是该数字二进制的前8位，因此得到截断至8位的值。</p>
+<h3 id="八进制和十六进制"><a href="#八进制和十六进制" class="headerlink" title="八进制和十六进制"></a>八进制和十六进制</h3><p>八进制和十六进制在表达与计算机相关的值时很方便。例如，十进制数65536经常出现在16位机中，用十六进制表示正好是10000。另外，十六进制数的每一位的数恰好由4位二进制数表示。例如，十六进制数3是0011，十六进制数5是0101。因此，十六进制数35的位组合（bit pattern）是00110101，十六进制数53的位组合是01010011。这种对应关系使得十六进制和二进制的转换非常方便。</p>
+<p>在C语言中，用特定的前缀表示使用哪种进制。<code>0x</code>或<code>0X</code>前缀表示十六进制值，所以十进制数<code>16</code>表示成十六进制是<code>0x10</code>或<code>0X10</code>。与此类似，<code>0</code>前缀表示八进制。例如，十进制数<code>16</code>表示成八进制是<code>020</code>。但是这种进制转换只是方便人查看和使用，计算机本身对于任何数都是以二进制储存的。</p>
+<p><strong>需要注意：</strong>在printf()中<code>%o, %x, %X, %#o, %#x, %#X</code>都是打印无符号的八进制/十六进制整数，负数若使用上述转换说明打印，输出的是对应的补码结果。以十六进制为例：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> num1 = <span class="number">-0X12</span>;</span><br><span class="line">    <span class="keyword">int</span> num2 = <span class="number">0X12</span>;</span><br><span class="line">  </span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"decimal: %d hexadecimal: %#X\n"</span>, num1, num1); <span class="comment">// negative</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"decimal: %d hexadecimal: %#X\n"</span>, num2, num2); <span class="comment">// positive</span></span><br><span class="line">  </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">output:</span></span><br><span class="line"><span class="comment">decimal: -18 hexadecimal: 0XFFFFFFEE</span></span><br><span class="line"><span class="comment">decimal: 18 hexadecimal: 0X12</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>八进制位</th>
+<th>等价的二进制位</th>
+<th>八进制位</th>
+<th>等价的二进制位</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0</td>
+<td>000</td>
+<td>4</td>
+<td>100</td>
+</tr>
+<tr>
+<td>1</td>
+<td>001</td>
+<td>5</td>
+<td>101</td>
+</tr>
+<tr>
+<td>2</td>
+<td>010</td>
+<td>6</td>
+<td>110</td>
+</tr>
+<tr>
+<td>3</td>
+<td>011</td>
+<td>7</td>
+<td>111</td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th>十进制</th>
+<th>十六进制</th>
+<th>等价二进制</th>
+<th>十进制</th>
+<th>十六进制</th>
+<th>等价二进制</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0</td>
+<td>0</td>
+<td>0000</td>
+<td>8</td>
+<td>8</td>
+<td>1000</td>
+</tr>
+<tr>
+<td>1</td>
+<td>1</td>
+<td>0001</td>
+<td>9</td>
+<td>9</td>
+<td>1001</td>
+</tr>
+<tr>
+<td>2</td>
+<td>2</td>
+<td>0010</td>
+<td>10</td>
+<td>a</td>
+<td>1010</td>
+</tr>
+<tr>
+<td>3</td>
+<td>3</td>
+<td>0011</td>
+<td>11</td>
+<td>b</td>
+<td>1011</td>
+</tr>
+<tr>
+<td>4</td>
+<td>4</td>
+<td>0100</td>
+<td>12</td>
+<td>c</td>
+<td>1100</td>
+</tr>
+<tr>
+<td>5</td>
+<td>5</td>
+<td>0101</td>
+<td>13</td>
+<td>d</td>
+<td>1101</td>
+</tr>
+<tr>
+<td>6</td>
+<td>6</td>
+<td>0110</td>
+<td>14</td>
+<td>e</td>
+<td>1110</td>
+</tr>
+<tr>
+<td>7</td>
+<td>7</td>
+<td>0111</td>
+<td>15</td>
+<td>f</td>
+<td>1111</td>
+</tr>
+</tbody></table>
+<h3 id="位运算符"><a href="#位运算符" class="headerlink" title="位运算符"></a>位运算符</h3><ul>
+<li><p><strong>～</strong>：取反</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">～(<span class="number">1001</span> <span class="number">1010</span>);             <span class="comment">// 结果为 0110 0101</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>&amp;</strong>:  与</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(<span class="number">1001</span> <span class="number">0011</span>) &amp; (<span class="number">0011</span> <span class="number">1101</span>); <span class="comment">// 结果为 0001 0001</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>|</strong>:  或</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(<span class="number">1001</span> <span class="number">0011</span>) | (<span class="number">0011</span> <span class="number">1101</span>); <span class="comment">// 结果为 1011 1111</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>^</strong>: 异或</p>
+<p>1 ^ 0 = 1; 0 ^ 0 = 0; 1 ^ 1 = 0</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(<span class="number">1001</span> <span class="number">0011</span>) | (<span class="number">0011</span> <span class="number">1101</span>); <span class="comment">// 结果为 1010 1110</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>&lt;&lt;</strong>: 左移</p>
+<p>移除运算对象左末端位的值，用0填充空出的位置</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(<span class="number">1000</span> <span class="number">1010</span>)  &lt;&lt; <span class="number">2</span>;         <span class="comment">// 结果为 0010 1000 </span></span><br><span class="line">number &lt;&lt; n;　             <span class="comment">// 等于number乘以2的n次幂</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>&gt;&gt;</strong>: 右移</p>
+<p>移除运算对象右末端位的值，对于无符号类型，用0填充空出的位置，对于有符号类型，结果取决于机器,空出的位置可用0填充，或者用符号位（即，最左端的位）的副本填充</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">(<span class="number">1000</span> <span class="number">1010</span>) &gt;&gt; <span class="number">2</span>;          <span class="comment">// 无符号值，结果为 0010 0010</span></span><br><span class="line">(<span class="number">1000</span> <span class="number">1010</span>) &gt;&gt; <span class="number">2</span>;          <span class="comment">// 有符号值，某些系统中结果为 0010 0010</span></span><br><span class="line">(<span class="number">1000</span> <span class="number">1010</span>) &gt;&gt; <span class="number">2</span>;          <span class="comment">// 有符号值，某些系统中结果为 1110 0010</span></span><br><span class="line">number &lt;&lt; n;　             <span class="comment">// 如果number为非负数，等于number除以2的n次幂</span></span><br></pre></td></tr></table></figure>
+
+
+
+
+
+</li>
+</ul>
+<h3 id="位运算符用法"><a href="#位运算符用法" class="headerlink" title="位运算符用法"></a>位运算符用法</h3><h4 id="掩码"><a href="#掩码" class="headerlink" title="掩码"></a>掩码</h4><p>由于任何值与1做&amp;运算都是其自身，任何值与0做&amp;运算都是0，所以可以隐藏指定的位</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">flags = flags &amp; MASK;     <span class="comment">// MASK中0是隐藏，1是显示</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="打开位"><a href="#打开位" class="headerlink" title="打开位"></a>打开位</h4><p>由于任何值与1做｜运算都是1，任何值与0做｜运算都是其自身，可以用｜运算在不影响其他位的情况下关闭指定的位</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">flags = flags ｜ MASK;     <span class="comment">// MASK中0是不变，1是打开</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="关闭位"><a href="#关闭位" class="headerlink" title="关闭位"></a>关闭位</h4><p>由于任何值与1做&amp;运算都是其自身，任何值与0做&amp;运算都是0，在不影响其他位的情况下关闭指定的位</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">flags = flags &amp; ~MASK      <span class="comment">// MASK中0是不变，1是关闭</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="切换位"><a href="#切换位" class="headerlink" title="切换位"></a>切换位</h4><p>切换位指的是打开已关闭的位，或关闭已打开的位。由于1^=0, 0 ^ 1=1,0可以使用按位异或运算符^切换位</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">flags = flags ^ MASK        <span class="comment">// MASK中0是不变，1是切换</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="检查位的值"><a href="#检查位的值" class="headerlink" title="检查位的值"></a>检查位的值</h4><p>要检查某个位的值，例如，flags中 1号位是否被设置为1？不能这样直接比较flags和MASK。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (flags == MASK)</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">"Wow"</span>)  <span class="comment">// 不能正常工作</span></span><br></pre></td></tr></table></figure>
+
+<p>这样做即使flags的1号位为1，其他位的值会导致比较结果为假。因此，<strong>必须覆盖flags中的其他位，只用1号位和MASK比较：</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> ((flags &amp; MASK) == MASK) <span class="comment">// MASK中，1是待检查的位，0是不需检查的0</span></span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">"Wow"</span>)  <span class="comment">// 正常工作</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="位字段-Bit-Fields"><a href="#位字段-Bit-Fields" class="headerlink" title="位字段(Bit-Fields)"></a>位字段(Bit-Fields)</h3><h4 id="声明"><a href="#声明" class="headerlink" title="声明"></a>声明</h4><p>位字段在C中通过结构声明，可以在结构中操控一个值中的单独位或多个位。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">int</span> autfd : <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">int</span> bldfc : <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">int</span> undln : <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">int</span> itals : <span class="number">1</span>;</span><br><span class="line">&#125; prnt;</span><br></pre></td></tr></table></figure>
+
+<p>根据该声明，prnt包含4个1位的字段。现在，可以通过普通的结构成员运算符（.）单独给这些字段赋值：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">prnt.itals = <span class="number">0</span>;</span><br><span class="line">prnt.undln = <span class="number">1</span>;</span><br></pre></td></tr></table></figure>
+
+<p>由于每个字段恰好为1位，所以只能为其赋值1或0。<strong>变量prnt被储存在 unsigned int大小的内存单元中，但是在本例中只使用了其中的4位。</strong> </p>
+<p><strong>多位字段</strong></p>
+<p>有时，某些设置也有多个选择，因此需要多位来表示，<strong>但是要确保所赋的值不超出字段可容纳的范围</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">int</span> codel : <span class="number">2</span>;     <span class="comment">// 2位字段</span></span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">int</span> code2 : <span class="number">2</span>;     <span class="comment">// 2位字段</span></span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">int</span> code3 : <span class="number">8</span>;     <span class="comment">// 8位字段</span></span><br><span class="line">&#125; prcode;</span><br></pre></td></tr></table></figure>
+
+<p>如果声明的总位数超过了一个unsigned int类型的大小，会用到下一个unsigned int类型的存储位置。一个字段不允许跨越两个unsigned int之间的边界。编译器会自动移动跨界的字段，保持unsigned int的边界对齐。一旦发生这种情况，第1个unsigned int中会留下一个未命名的“洞”。</p>
+<p>可以用未命名的字段宽度“填充”未命名的“洞”。使用一个宽度为0的未命名字段迫使下一个字段与下一个整数对齐：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">int</span> field1 : <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">int</span>        : <span class="number">2</span>;    <span class="comment">// 添加一个2位的空隙</span></span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">int</span> field2 : <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">int</span>        : <span class="number">0</span>;    <span class="comment">// 添加宽度为0的未命名字段，迫使field3储存在下一个unsigned int 中</span></span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">int</span> field3 : <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里，在stuff.field1和stuff.field2之间，有一个2位的空隙；stuff.field3将储存在下一个unsigned int中。</p>
+<p><strong>不同机器上的位字段储存方式</strong></p>
+<p>字段储存在一个int中的顺序取决于机器。在有些机器上，存储的顺序是从左往右，而在另一些机器上，是从右往左。另外，不同的机器中两个字段边界的位置也有区别。由于这些原因，位字段通常都不容易移植。尽管如此，有些情况却要用到这种不可移植的特性。例如，以特定硬件设备所用的形式储存数据。</p>
+<h4 id="例子"><a href="#例子" class="headerlink" title="例子"></a>例子</h4><table>
+<thead>
+<tr>
+<th>Bit Pattern</th>
+<th>Decimal</th>
+<th>Color</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>000</td>
+<td>0</td>
+<td>Black</td>
+</tr>
+<tr>
+<td>001</td>
+<td>1</td>
+<td>Red</td>
+</tr>
+<tr>
+<td>010</td>
+<td>2</td>
+<td>Green</td>
+</tr>
+<tr>
+<td>011</td>
+<td>3</td>
+<td>Yellow</td>
+</tr>
+<tr>
+<td>100</td>
+<td>4</td>
+<td>Blue</td>
+</tr>
+<tr>
+<td>101</td>
+<td>5</td>
+<td>Magenta</td>
+</tr>
+<tr>
+<td>110</td>
+<td>6</td>
+<td>Cyan</td>
+</tr>
+<tr>
+<td>111</td>
+<td>7</td>
+<td>White</td>
+</tr>
+</tbody></table>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdbool.h&gt;</span></span></span><br><span class="line"><span class="comment">/* line style */</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> SOLID 0</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> DOTTED 1</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> DASHED 2</span></span><br><span class="line">/ * primary colors */</span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> BLUE 4   </span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> GREEN 2</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> RED 1</span></span><br><span class="line">/ * mixed colors */</span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> BLACK 0</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> YELLOW (RED | GREEN)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> MEGENTA (RED | BLUE)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> CYAN (GREEN | BLUE)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> WHITE (RED | GREEN | BLUE)</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">char</span> *colors[<span class="number">8</span>] = &#123;<span class="string">"black"</span>, <span class="string">"red"</span>, <span class="string">"green"</span>, <span class="string">"yellow"</span>, <span class="string">"blue"</span>,</span><br><span class="line">                         <span class="string">"megenta"</span>, <span class="string">"cyan"</span>, <span class="string">"white"</span>&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">box_probs</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="keyword">bool</span> opaque               : <span class="number">1</span>;  <span class="comment">// or unsigned int (pre C99)</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span> fill_color   : <span class="number">3</span>;</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span>              : <span class="number">4</span>;</span><br><span class="line">    <span class="keyword">bool</span> show_border          : <span class="number">1</span>;  <span class="comment">// or unsigned int (pre C99)</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span> border_color : <span class="number">3</span>;</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span> border_style : <span class="number">2</span>;</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span>              : <span class="number">2</span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">show_settings</span><span class="params">(<span class="keyword">const</span> struct box_probs * pb)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  	/ * create <span class="keyword">and</span> initialize box_props structure */</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">box_probs</span> <span class="title">box</span> = &#123;</span><span class="literal">true</span>, YELLOW, <span class="literal">true</span>, GREEN, DASHED&#125;;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">"Original box settings:"</span>);</span><br><span class="line">    show_settings(&amp;box);</span><br><span class="line"></span><br><span class="line">    box.opaque = <span class="literal">false</span>;</span><br><span class="line">    box.fill_color = WHITE;</span><br><span class="line">    box.border_color = MEGENTA;</span><br><span class="line">    box.border_style = SOLID;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"\nModified box seetings:\n"</span>);</span><br><span class="line">    show_settings(&amp;box);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">show_settings</span><span class="params">(<span class="keyword">const</span> struct box_probs * pb)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"Box is %s\n"</span>, pb-&gt;opaque == <span class="literal">true</span> ? <span class="string">"opaque"</span> : <span class="string">"transparent"</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"The filling color is %s\n"</span>, colors[pb-&gt;fill_color]);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"Border %s\n"</span>, pb-&gt;show_border == <span class="literal">true</span> ? <span class="string">"shown"</span> : <span class="string">"not shown"</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"The border color is %s"</span>, colors[pb-&gt;border_color]);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"The border style is "</span>);</span><br><span class="line">    <span class="keyword">switch</span> (pb-&gt;border_style)</span><br><span class="line">    &#123;</span><br><span class="line">    <span class="keyword">case</span> SOLID: <span class="built_in">printf</span>(<span class="string">"solid.\n"</span>);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">case</span> DOTTED: <span class="built_in">printf</span>(<span class="string">"dotted.\n"</span>);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">case</span> DASHED: <span class="built_in">printf</span>(<span class="string">"dashed.\n"</span>);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">default</span>: <span class="built_in">printf</span>(<span class="string">"unkown type.\n"</span>);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="对齐特性-C11"><a href="#对齐特性-C11" class="headerlink" title="对齐特性(C11)"></a>对齐特性(C11)</h3><p>C11 的对齐特性比用位填充字节更自然，它们还代表了C在处理硬件相关问题上的能力。在这种上下文中，对齐指的是如何安排对象在内存中的位置。例如，<strong>为了效率最大化，系统可能要把一个 double 类型的值储存在4 字节内存地址上，但却允许把char储存在任意地址</strong>。大部分程序员都对对齐不以为然。但是，有些情况又受益于对齐控制。例如，把数据从一个硬件位置转移到另一个位置，或者调用指令同时操作多个数据项。</p>
+<h4 id="Alignof-运算符"><a href="#Alignof-运算符" class="headerlink" title="_Alignof 运算符"></a>_Alignof 运算符</h4><p> <code>_Alignof</code>运算符给出一个类型的对齐要求，在关键字<code>_Alignof</code>后面的圆括号中写上类型名即可：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">size_t</span> d_align = _Alignoif(<span class="keyword">float</span>);</span><br></pre></td></tr></table></figure>
+
+<p>假设d_align的值是4，意思是float类型对象的对齐要求是4。也就是说， 4是储存该类型值相邻地址的字节数差。一般而言，对齐值都应该是2的非负整数次幂。较大的对齐值被称为stricter或stronger，较小的对齐值被称为 weaker。</p>
+<h4 id="Alignas说明符"><a href="#Alignas说明符" class="headerlink" title="_Alignas说明符"></a>_Alignas说明符</h4><p>可以使用<code>_Alignas</code>说明符指定一个变量或类型的对齐值。但是，不应该要求该值小于基本对齐值。例如，如果float类型的对齐要求是4，不要请求其对齐值是1或2。该说明符用作声明的一部分，说明符后面的圆括号内包含对齐值或类型：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">_Alignas(<span class="keyword">double</span>) <span class="keyword">char</span> c1;</span><br><span class="line">_Alignas(<span class="number">8</span>) <span class="keyword">char</span> c2;</span><br><span class="line"><span class="keyword">unsigned</span> <span class="keyword">char</span> _Alignas(<span class="keyword">long</span> <span class="keyword">double</span>) c_arr[<span class="keyword">sizeof</span>(<span class="keyword">long</span> <span class="keyword">double</span>)];</span><br></pre></td></tr></table></figure>
+
+<p>在新版的Clang和GCC中，无论_Alignas(type)说明符在类型说明符的前面还是后面都可以</p>
+<h4 id="stdalign-h"><a href="#stdalign-h" class="headerlink" title="stdalign.h"></a>stdalign.h</h4><p>在程序中包含 stdalign.h 头文件后，就可以把 alignas 和 alignof 分别作为 <code>_Alignas</code>和<code>_Alignof</code>的别名。这样做可以与C++关键字匹配。</p>
+<h4 id="aligned-alloc"><a href="#aligned-alloc" class="headerlink" title="aligned_alloc"></a>aligned_alloc</h4><p>C11在stdlib.h库还添加了一个新的内存分配函数，用于对齐动态分配的 内存。该函数的原型如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> * <span class="title">aligned_alloc</span><span class="params">(<span class="keyword">size_t</span> alignment, <span class="keyword">size_t</span> <span class="built_in">size</span>)</span></span></span><br></pre></td></tr></table></figure>
+
+<p>第1个参数代表指定的对齐，第2个参数是所需的字节数，其值应是第1个参数的倍数。与其他内存分配函数一样，要使用free()函数释放之前分配的内存。</p>
+<h4 id="例子-1"><a href="#例子-1" class="headerlink" title="例子"></a>例子</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">double</span> dx;</span><br><span class="line">    <span class="keyword">char</span> ca;</span><br><span class="line">    <span class="keyword">char</span> cx;</span><br><span class="line">    <span class="keyword">double</span> dz;</span><br><span class="line">    <span class="keyword">char</span> cb;</span><br><span class="line">    <span class="keyword">char</span> _Alignas(<span class="keyword">double</span>) cz;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"char alignment: %zd\n"</span>, _Alignof(<span class="keyword">char</span>));</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"double alignment: %zd\n"</span>, _Alignof(<span class="keyword">double</span>));</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"&amp;dx: %p\n"</span>, &amp;dx);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"&amp;ca: %p\n"</span>, &amp;ca);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"&amp;cx: %p\n"</span>, &amp;cx);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"&amp;dz: %p\n"</span>, &amp;dz);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"&amp;cb: %p\n"</span>, &amp;cb);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"&amp;cz: %p\n"</span>, &amp;cz);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">char alignment: 1</span></span><br><span class="line"><span class="comment">double alignment: 8</span></span><br><span class="line"><span class="comment">&amp;dx: 0x7ffeea9de610</span></span><br><span class="line"><span class="comment">&amp;ca: 0x7ffeea9de60f</span></span><br><span class="line"><span class="comment">&amp;cx: 0x7ffeea9de60e</span></span><br><span class="line"><span class="comment">&amp;dz: 0x7ffeea9de600</span></span><br><span class="line"><span class="comment">&amp;cb: 0x7ffeea9de5ff</span></span><br><span class="line"><span class="comment">&amp;cz: 0x7ffeea9de5f8</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<p>在我们的系统中，double的对齐值是8，这意味着地址的类型对齐可以 被8整除。以0或8结尾的十六进制地址可被8整除。这就是地址常用两个 double类型的变量和char类型的变量cz（该变量是double对齐值）。因为char 的对齐值是1，对于普通的char类型变量，编译器可以使用任何地址。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/06/13/%E5%82%A8%E5%AD%98%E7%B1%BB%E5%9E%8B%E3%80%81%E9%93%BE%E6%8E%A5%E5%92%8C%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/" rel="prev" title="储存类型、链接和内存管理">
+      <i class="fa fa-chevron-left"></i> 储存类型、链接和内存管理
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/06/13/C%E9%A2%84%E5%A4%84%E7%90%86%E5%99%A8%E5%92%8CC%E5%BA%93/" rel="next" title="C预处理器和C库">
+      C预处理器和C库 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#二进制"><span class="nav-number">1.</span> <span class="nav-text">二进制</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#十进制转换"><span class="nav-number">1.1.</span> <span class="nav-text">十进制转换</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#二进制补码-two’s-complement"><span class="nav-number">1.2.</span> <span class="nav-text">二进制补码 (two’s complement)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#二进制反码-one’s-complement"><span class="nav-number">1.3.</span> <span class="nav-text">二进制反码 (one’s complement)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#二进制截断"><span class="nav-number">1.4.</span> <span class="nav-text">二进制截断</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#八进制和十六进制"><span class="nav-number">2.</span> <span class="nav-text">八进制和十六进制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#位运算符"><span class="nav-number">3.</span> <span class="nav-text">位运算符</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#位运算符用法"><span class="nav-number">4.</span> <span class="nav-text">位运算符用法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#掩码"><span class="nav-number">4.1.</span> <span class="nav-text">掩码</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#打开位"><span class="nav-number">4.2.</span> <span class="nav-text">打开位</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#关闭位"><span class="nav-number">4.3.</span> <span class="nav-text">关闭位</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#切换位"><span class="nav-number">4.4.</span> <span class="nav-text">切换位</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#检查位的值"><span class="nav-number">4.5.</span> <span class="nav-text">检查位的值</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#位字段-Bit-Fields"><span class="nav-number">5.</span> <span class="nav-text">位字段(Bit-Fields)</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#声明"><span class="nav-number">5.1.</span> <span class="nav-text">声明</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#例子"><span class="nav-number">5.2.</span> <span class="nav-text">例子</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#对齐特性-C11"><span class="nav-number">6.</span> <span class="nav-text">对齐特性(C11)</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Alignof-运算符"><span class="nav-number">6.1.</span> <span class="nav-text">_Alignof 运算符</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Alignas说明符"><span class="nav-number">6.2.</span> <span class="nav-text">_Alignas说明符</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#stdalign-h"><span class="nav-number">6.3.</span> <span class="nav-text">stdalign.h</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#aligned-alloc"><span class="nav-number">6.4.</span> <span class="nav-text">aligned_alloc</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#例子-1"><span class="nav-number">6.5.</span> <span class="nav-text">例子</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">崔梓坤</p>
+  <div class="site-description" itemprop="description">我的计算机学习经历和笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">15</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">崔梓坤</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

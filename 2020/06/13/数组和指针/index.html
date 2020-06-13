@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="数组初始化数组 正常初始化：用以逗号分隔的值列表（用花括号括起来）来初始化数组，各值之间用逗号分隔。在逗号和值之间可以使用空格。根据上面的初始化，把 1 赋给数组的首元素（powers[0]），以此类推（不支持ANSI的编译器会把这种形式的初始化识别为语法错误，在数组声明前加上关键字static可解决此问题。 未初始化的数组：编译器使用的值是内存相应位置上的现有值。 初始化列表中的值少于数组元素个">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数组和指针">
+<meta property="og:url" content="http://yoursite.com/2020/06/13/%E6%95%B0%E7%BB%84%E5%92%8C%E6%8C%87%E9%92%88/index.html">
+<meta property="og:site_name" content="崔梓坤的个人博客">
+<meta property="og:description" content="数组初始化数组 正常初始化：用以逗号分隔的值列表（用花括号括起来）来初始化数组，各值之间用逗号分隔。在逗号和值之间可以使用空格。根据上面的初始化，把 1 赋给数组的首元素（powers[0]），以此类推（不支持ANSI的编译器会把这种形式的初始化识别为语法错误，在数组声明前加上关键字static可解决此问题。 未初始化的数组：编译器使用的值是内存相应位置上的现有值。 初始化列表中的值少于数组元素个">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://gitee.com/Carlisle345748/cloudimg/raw/master/img/%E5%88%9D%E5%A7%8B%E5%8C%96%E5%A4%9A%E7%BB%B4%E6%95%B0%E7%BB%84%E7%9A%84%E4%B8%A4%E7%A7%8D%E6%96%B9%E6%B3%95.png">
+<meta property="og:image" content="https://gitee.com/Carlisle345748/cloudimg/raw/master/img/%E6%95%B0%E7%BB%84%E4%B8%AD%E7%9A%84%E6%8C%87%E9%92%88%E8%BF%90%E7%AE%97.png">
+<meta property="og:image" content="https://gitee.com/Carlisle345748/cloudimg/raw/master/img/%E8%8E%B7%E5%8F%96%E4%BA%8C%E7%BB%B4%E6%95%B0%E7%BB%84%E7%9A%84%E5%80%BC.png">
+<meta property="og:image" content="https://gitee.com/Carlisle345748/cloudimg/raw/master/img/%E6%95%B0%E7%BB%84%E7%9A%84%E6%95%B0%E7%BB%84%E4%B8%AD%E7%9A%84%E5%9C%B0%E5%9D%80.png">
+<meta property="article:published_time" content="2020-06-13T10:23:44.000Z">
+<meta property="article:modified_time" content="2020-06-13T10:45:22.848Z">
+<meta property="article:author" content="崔梓坤">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gitee.com/Carlisle345748/cloudimg/raw/master/img/%E5%88%9D%E5%A7%8B%E5%8C%96%E5%A4%9A%E7%BB%B4%E6%95%B0%E7%BB%84%E7%9A%84%E4%B8%A4%E7%A7%8D%E6%96%B9%E6%B3%95.png">
+
+<link rel="canonical" href="http://yoursite.com/2020/06/13/%E6%95%B0%E7%BB%84%E5%92%8C%E6%8C%87%E9%92%88/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>数组和指针 | 崔梓坤的个人博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">崔梓坤的个人博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/06/13/%E6%95%B0%E7%BB%84%E5%92%8C%E6%8C%87%E9%92%88/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="崔梓坤">
+      <meta itemprop="description" content="我的计算机学习经历和笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="崔梓坤的个人博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          数组和指针
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-06-13 18:23:44 / 修改时间：18:45:22" itemprop="dateCreated datePublished" datetime="2020-06-13T18:23:44+08:00">2020-06-13</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="数组"><a href="#数组" class="headerlink" title="数组"></a>数组</h2><h3 id="初始化数组"><a href="#初始化数组" class="headerlink" title="初始化数组"></a>初始化数组</h3><ul>
+<li><strong>正常初始化</strong>：用以逗号分隔的值列表（用花括号括起来）来初始化数组，各值之间用逗号分隔。在逗号和值之间可以使用空格。根据上面的初始化，把 1 赋给数组的首元素（powers[0]），以此类推（不支持ANSI的编译器会把这种形式的初始化识别为语法错误，在数组声明前加上关键字static可解决此问题。</li>
+<li><strong>未初始化的数组</strong>：编译器使用的值是内存相应位置上的现有值。</li>
+<li><strong>初始化列表中的值少于数组元素个数</strong>：编译器会把剩余的元素都初始化为0</li>
+<li><strong>初始化列表中的值多于数组元素个数</strong>：编译器报错</li>
+<li><strong>不指定数组大小</strong>：编译器会根据初始化列表中的项数来确定数组的大小</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> SIZE 5</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">		<span class="keyword">int</span> with_data[SIZE] = &#123;<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>&#125;; <span class="comment">// 逗号分隔的值列表初始化数组</span></span><br><span class="line">    <span class="keyword">int</span> no_data[SIZE];                     <span class="comment">// 未初始化</span></span><br><span class="line">    <span class="keyword">int</span> less[SIZE] = &#123;<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>&#125;;            <span class="comment">// 值列表项数小于数组大小</span></span><br><span class="line">    <span class="keyword">int</span> more[SIZE] = &#123;<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>&#125;;   <span class="comment">// 值列表项数大于数组大小</span></span><br><span class="line">    <span class="keyword">int</span> no_size[] = &#123;<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>&#125;;       <span class="comment">// 让编译器自动匹配数组大小</span></span><br><span class="line">  	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*打印以上数组*/</span></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">i with_date[i]</span></span><br><span class="line"><span class="comment">0            1</span></span><br><span class="line"><span class="comment">1            2</span></span><br><span class="line"><span class="comment">2            3</span></span><br><span class="line"><span class="comment">3            4</span></span><br><span class="line"><span class="comment">4            5</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">i   no_date[i]</span></span><br><span class="line"><span class="comment">0            0</span></span><br><span class="line"><span class="comment">1       421546</span></span><br><span class="line"><span class="comment">2      4551233</span></span><br><span class="line"><span class="comment">3        45652</span></span><br><span class="line"><span class="comment">4       714564</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">i less_date[i]</span></span><br><span class="line"><span class="comment">0            1</span></span><br><span class="line"><span class="comment">1            2</span></span><br><span class="line"><span class="comment">2            3</span></span><br><span class="line"><span class="comment">3            0</span></span><br><span class="line"><span class="comment">4            0</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">i more_data[i]</span></span><br><span class="line"><span class="comment">编译器报错</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">i   no_size[i]</span></span><br><span class="line"><span class="comment">0            1</span></span><br><span class="line"><span class="comment">1            2</span></span><br><span class="line"><span class="comment">2            3</span></span><br><span class="line"><span class="comment">3            4</span></span><br><span class="line"><span class="comment">4            5</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="指定初始化器-Desinated-Initializers"><a href="#指定初始化器-Desinated-Initializers" class="headerlink" title="指定初始化器(Desinated Initializers)"></a>指定初始化器(Desinated Initializers)</h4><p>C99 增加了一个新特性：指定初始化器（designated initializer）。<strong>利用该特性可以初始化指定的数组元素。例如，只初始化数组中的最后一个元素,其他为初始化的元素设为0，比如 <code>int arr[6] = {[5] = 212};</code></strong>。对于传统的C初始化语法，必须初始化最后一个元素之前的所有元素。</p>
+<h5 id="指定初始化器的两个重要特性："><a href="#指定初始化器的两个重要特性：" class="headerlink" title="指定初始化器的两个重要特性："></a>指定初始化器的两个重要特性：</h5><ul>
+<li>如果指定初始化器后面有更多的值，如该例中的初始化列表中的片段：<code>[4] = 31,30,31</code>，那么后面的值将被用于初始化指定元素后面的元素。也就是说，在days[4]被初始化为31后，days[5]和days[6]将分别被初始化为30和31。</li>
+<li>如果再次初始化指定的元素，那么最后的初始化将会取代之前的初始化。例如下面例子中，初始化列表开始时把days[1]初始化为28，但是days[1]又被后面的指定初始化<code>[1] = 29</code>初始化为29。</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> MONTH 12</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> i;</span><br><span class="line">    <span class="keyword">int</span> days[MONTH] = &#123;<span class="number">31</span>, <span class="number">28</span>, [<span class="number">4</span>] = <span class="number">31</span>, <span class="number">30</span>, <span class="number">31</span>, [<span class="number">1</span>] = <span class="number">29</span>&#125;;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; MONTH; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"%2d %d\n"</span>, i, days[i]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">output:</span></span><br><span class="line"><span class="comment"> 0 31</span></span><br><span class="line"><span class="comment"> 1 29  （先被初始化为28，然后被[1] = 29	初始化为29）</span></span><br><span class="line"><span class="comment"> 2 0</span></span><br><span class="line"><span class="comment"> 3 0</span></span><br><span class="line"><span class="comment"> 4 31</span></span><br><span class="line"><span class="comment"> 5 30  （根据 [4] = 31, 30,31，days[4	]被初始化为31后，days[5]和days[6]被初始化为30和31）</span></span><br><span class="line"><span class="comment"> 6 31</span></span><br><span class="line"><span class="comment"> 7 0</span></span><br><span class="line"><span class="comment"> 8 0</span></span><br><span class="line"><span class="comment"> 9 0</span></span><br><span class="line"><span class="comment">10 0</span></span><br><span class="line"><span class="comment">11 0</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<p>如果未指定元素大小会怎样？</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> stuff[] = &#123;<span class="number">1</span>, [<span class="number">6</span>] = <span class="number">23</span>&#125;;　</span><br><span class="line"><span class="keyword">int</span> staff[] = &#123;<span class="number">1</span>, [<span class="number">6</span>] = <span class="number">4</span>, <span class="number">9</span>, <span class="number">10</span>&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>编译器会把数组的大小设置为足够装得下初始化的值。所以，stuff数组 有7个元素，编号为0～6；而staff数组的元素比stuff数组多两个（即有9个元素）。</p>
+<blockquote>
+<p><strong>Const 和数组大小</strong></p>
+<p>是否可以在声明数组时使用const变量？ </p>
+<p>const int SZ = 80;</p>
+<p>double ar[SIZE];</p>
+<p>C90标准不允许（也可能允许）。数组的大小必须是给定的整型常量表达式，可以是整型常量组合，如20、sizeof表达式或其他不是const的内容。 由于C实现可以扩大整型常量表达式的范围，所以可能会允许使用const，但是这种代码可能无法移植。</p>
+<p>C99/C11 标准允许在声明变长数组(VLA)时使用 const 变量。所以该数组的定义必须是声明在块(block)中的自动存储类别数组(automatic storage class array)。</p>
+</blockquote>
+<h3 id="数组赋值"><a href="#数组赋值" class="headerlink" title="数组赋值"></a>数组赋值</h3><p>声明数组后，可以借助数组下标（或索引）给数组元素赋值。在C语言中，数组的索引从<code>0</code>开始，直到<code>数组长度 -1</code>。<strong>注意：C 不允许把数组作为 一个单元赋给另一个数组，除初始化以外也不允许使用花括号列表的形式赋值</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> SIZE 5</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> oxen[SIZE] = &#123;<span class="number">5</span>,<span class="number">3</span>,<span class="number">2</span>,<span class="number">8</span>&#125;;</span><br><span class="line"><span class="keyword">int</span> yask[SIZE];</span><br><span class="line"></span><br><span class="line">yask[<span class="number">0</span>] = oxen[<span class="number">0</span>];   <span class="comment">// 允许</span></span><br><span class="line">yask = oxen;         <span class="comment">// 不允许</span></span><br><span class="line">yask = &#123;<span class="number">5</span>,<span class="number">3</span>,<span class="number">2</span>,<span class="number">8</span>&#125;     <span class="comment">// 不允许</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="数组边界"><a href="#数组边界" class="headerlink" title="数组边界"></a>数组边界</h3><p>注意，C语言不会检查编号是否正确，如果编号超出数组的范围，C语言不会报错，C语言会按指令直接修改对应的内存位置，导致不可预料的错误。</p>
+<p>C 语言为何会允许这种麻烦事发生？这要归功于 C 信任程序员的原则。不检查边界，C 程序可以运行更快。编译器没必要捕获所有的下标错误，因为在程序运行之前，数组的下标值可能尚未确定。因此，为安全起见，编译器必须在运行时添加额外代码检查数组的每个下标值，这会降低程序的运行速度。C 相信程序员能编写正确的代码，这样的程序运行速度更快。但并不是所有的程序员都能做到这一点，所以就出现了下标越界的问题。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> SIZE 4</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> value1 = <span class="number">44</span>;</span><br><span class="line">    <span class="keyword">int</span> arr[SIZE];</span><br><span class="line">    <span class="keyword">int</span> value2 = <span class="number">88</span>;</span><br><span class="line">    <span class="keyword">int</span> i;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"Value1 = %d, Value2 = %d\n"</span>, value1, value2);</span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">-1</span>; i &lt;= SIZE; i ++)</span><br><span class="line">        arr[i] = <span class="number">2</span> * i + <span class="number">1</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">-1</span>; i &lt;= <span class="number">7</span>; i ++)</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"%2d %d\n"</span>, i, arr[i]);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span> ;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">output:</span></span><br><span class="line"><span class="comment">-1 -1 (修改了arr[-1]对应的内存位置的值)</span></span><br><span class="line"><span class="comment"> 0 1</span></span><br><span class="line"><span class="comment"> 1 3</span></span><br><span class="line"><span class="comment"> 2 5</span></span><br><span class="line"><span class="comment"> 3 7</span></span><br><span class="line"><span class="comment"> 4 9  (修改了arr[4]对应的内存位置的值)</span></span><br><span class="line"><span class="comment"> 5 32766</span></span><br><span class="line"><span class="comment"> 6 383647857</span></span><br><span class="line"><span class="comment"> 7 -326505489</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="指定数组的大小"><a href="#指定数组的大小" class="headerlink" title="指定数组的大小"></a>指定数组的大小</h3><p>在C99标准之前，声明数组时只能在方括号中使用整型常量表达式。所谓整型常量表达式，是由整型常量构成的表达式。<strong>sizeof表达式被视为整型 常量，但是（与C++不同）const值不是</strong>。另外，表达式的值必须大于0：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> n = <span class="number">5</span>, m = <span class="number">8</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">float</span> a1[<span class="number">5</span>];               <span class="comment">// yes</span></span><br><span class="line"><span class="keyword">float</span> a1[<span class="number">5</span> * <span class="number">2</span> + <span class="number">1</span>];       <span class="comment">// yes</span></span><br><span class="line"><span class="keyword">float</span> a3[<span class="keyword">sizeof</span>(<span class="keyword">int</span>) + <span class="number">1</span>]; <span class="comment">// yes</span></span><br><span class="line"><span class="keyword">float</span> a4[<span class="number">0</span>];               <span class="comment">// no</span></span><br><span class="line"><span class="keyword">float</span> a5[(<span class="keyword">int</span>)<span class="number">2.5</span>];        <span class="comment">// yes</span></span><br><span class="line"><span class="keyword">float</span> a6[n];               <span class="comment">// not allowed before C99</span></span><br><span class="line"><span class="keyword">float</span> a7[m];               <span class="comment">// not allowed before C99</span></span><br></pre></td></tr></table></figure>
+
+<p>上面的注释表明，以前支持C90标准的编译器不允许后两种声明方式。 而C99标准允许这样声明，这创建了一种新型数组，称为变长数组 （variable-length array）或简称 VLA（C11 放弃了这一创新的举措，把VLA 设定为可选，而不是语言必备的特性）。</p>
+<h2 id="多维数组"><a href="#多维数组" class="headerlink" title="多维数组"></a>多维数组</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">float</span> rain[<span class="number">5</span>][<span class="number">12</span>]</span><br></pre></td></tr></table></figure>
+
+<p>主数组（master array）有5个元素 ，每个元素是内含12个元素的数组。rain的首元素<code>rain[0]</code>是一个内含12个float类型值的数组。所以，<code>rain[1]</code>、<code>rain[2]</code>等也是如此。 <code>rain[0]</code>是一个数组，那么它的首元素就是 <code>rain[0][0]</code>，第 2 个元素是<code>rain[0][1]</code>，以此类推。</p>
+<p><strong>计算机的储存方式：</strong>在计算机内部， 多维数组是按顺序储存的，从第1个内含12个元素的数组开始，然后是第2 个内含12个元素的数组，以此类推。</p>
+<h4 id="初始化多维数组"><a href="#初始化多维数组" class="headerlink" title="初始化多维数组"></a>初始化多维数组</h4><p><strong>方法一</strong>：这个使用了5个数值列表，每个数值列表都用花括号括起来。第1 个列表的数据用于初始化数组的第1行，第2个列表的数据用于初始化数组的第2行</p>
+  <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">float</span> rain[<span class="number">5</span>][<span class="number">12</span>]　= </span><br><span class="line">&#123; </span><br><span class="line">&#123;<span class="number">4.3</span>,<span class="number">4.3</span>,<span class="number">4.3</span>,<span class="number">3.0</span>,<span class="number">2.0</span>,<span class="number">1.2</span>,<span class="number">0.2</span>,<span class="number">0.2</span>,<span class="number">0.4</span>,<span class="number">2.4</span>,<span class="number">3.5</span>,<span class="number">6.6</span>&#125;,</span><br><span class="line">&#123;<span class="number">8.5</span>,<span class="number">8.2</span>,<span class="number">1.2</span>,<span class="number">1.6</span>,<span class="number">2.4</span>,<span class="number">0.0</span>,<span class="number">5.2</span>,<span class="number">0.9</span>,<span class="number">0.3</span>,<span class="number">0.9</span>,<span class="number">1.4</span>,<span class="number">7.3</span>&#125;,</span><br><span class="line">&#123;<span class="number">9.1</span>,<span class="number">8.5</span>,<span class="number">6.7</span>,<span class="number">4.3</span>,<span class="number">2.1</span>,<span class="number">0.8</span>,<span class="number">0.2</span>,<span class="number">0.2</span>,<span class="number">1.1</span>,<span class="number">2.3</span>,<span class="number">6.1</span>,<span class="number">8.4</span>&#125;,</span><br><span class="line">&#123;<span class="number">7.2</span>,<span class="number">9.9</span>,<span class="number">8.4</span>,<span class="number">3.3</span>,<span class="number">1.2</span>,<span class="number">0.8</span>,<span class="number">0.4</span>,<span class="number">0.0</span>,<span class="number">0.6</span>,<span class="number">1.7</span>,<span class="number">4.3</span>,<span class="number">6.2</span>&#125;,</span><br><span class="line">&#123;<span class="number">7.6</span>,<span class="number">5.6</span>,<span class="number">3.8</span>,<span class="number">2.8</span>,<span class="number">3.8</span>,<span class="number">0.2</span>,<span class="number">0.0</span>,<span class="number">0.0</span>,<span class="number">0.0</span>,<span class="number">1.3</span>,<span class="number">2.6</span>,<span class="number">5.2</span>&#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p><strong>方法二</strong>：初始化时也可省略内部的花括号，只保留最外面的一对花括号。只要保证初始化的数值个数正确，初始化的效果与上面相同。但是如果初始化的数值不够，则按照先后顺序逐行初始化，直到用完所有的值。后面没有值初始化的元素被统一初始化为0。</p>
+<p><img src="https://gitee.com/Carlisle345748/cloudimg/raw/master/img/%E5%88%9D%E5%A7%8B%E5%8C%96%E5%A4%9A%E7%BB%B4%E6%95%B0%E7%BB%84%E7%9A%84%E4%B8%A4%E7%A7%8D%E6%96%B9%E6%B3%95.png" alt="初始化多维数组的两种方法"></p>
+<h2 id="指针和数组"><a href="#指针和数组" class="headerlink" title="指针和数组"></a>指针和数组</h2><p>在C语言中，<strong>数组名实际上是该数组首元素的地址</strong>:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">arr = &amp;arr[<span class="number">0</span>] <span class="comment">// 数组名是数组首元素的地址</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="数组中的指针运算"><a href="#数组中的指针运算" class="headerlink" title="数组中的指针运算"></a>数组中的指针运算</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> SIZE 4</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    short dates[SIZE];</span><br><span class="line">    short * pti;</span><br><span class="line">    short index;</span><br><span class="line">    <span class="keyword">double</span> bills[SIZE];</span><br><span class="line">    <span class="keyword">double</span> * ptf;</span><br><span class="line"></span><br><span class="line">    pti = dates;  <span class="comment">// 数组名为数组首元素的地址</span></span><br><span class="line">    ptf = bills;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"%23s %15s\n"</span>, <span class="string">"short"</span>, <span class="string">"double"</span>);</span><br><span class="line">    <span class="keyword">for</span> (index = <span class="number">0</span>; index &lt; SIZE; index++)</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"pointers + %d: %10p %10p\n"</span>, index, pti + index, ptf + index);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">output:</span></span><br><span class="line"><span class="comment">                  short          double</span></span><br><span class="line"><span class="comment">pointers + 0: 0x7ffeee394600 0x7ffeee3945e0</span></span><br><span class="line"><span class="comment">pointers + 1: 0x7ffeee394602 0x7ffeee3945e8</span></span><br><span class="line"><span class="comment">pointers + 2: 0x7ffeee394604 0x7ffeee3945f0</span></span><br><span class="line"><span class="comment">pointers + 3: 0x7ffeee394606 0x7ffeee3945f8</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<p>我们的操作系统中，地址按字节编址，short类型占用2字节，double类型占用8字节。<strong>在C中，“指针加1”指的是增加1个存储单元。对数组而言，这意味着“指针加1”后的地址是下一个元素的地址，而不是下一个字节的地址</strong>（见下图）。这就是为什么必须声明指针所指向对象类型的原因之一：只知道地址还不够，因为计算机要知道储存对象需要多少字节（即使指针指向的是scalar variable，也要知道变量的类型，否则<code>*pt</code> 就无法正确地取回地址上的值）。</p>
+<img src="https://gitee.com/Carlisle345748/cloudimg/raw/master/img/数组中的指针运算.png" alt="数组中的指针运算" style="zoom:45%;" />
+
+
+
+<h3 id="数组表示法和指针表示法"><a href="#数组表示法和指针表示法" class="headerlink" title="数组表示法和指针表示法"></a>数组表示法和指针表示法</h3><p>C语言中可以用<strong>数组表示法</strong>和<strong>指针表示法</strong>来表示数组中的对象<code>ar[n] = *(ar + n)</code>、<code>&amp;ar[n] = ar + n</code>。可以认为<code>*(ar + n)</code>的意思是“到内存的ar位置，然后移动n个储存单元，检索储存在那里的值”</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">dates + <span class="number">2</span> = &amp;date[<span class="number">2</span>]    <span class="comment">// 相同的地址</span></span><br><span class="line">dates[<span class="number">2</span>] = *(date + <span class="number">2</span>)  <span class="comment">// 相同的值</span></span><br></pre></td></tr></table></figure>
+
+<p>在使用指针表示法的时候，要注意<code>*(date+2)</code>和<code>*date + 2</code>表示的意思是不一样的，<code>*</code>运算符的优先级比<code>+</code>高，所以<code>*date + 2</code>表示取得data数组第1个值并加2，而不去的date数组的第三个值。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">*(date + <span class="number">2</span>);  <span class="comment">// date数组的第三个值</span></span><br><span class="line">*date + <span class="number">2</span>;    <span class="comment">// date数组的第一个值加2</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="函数、指针和数组"><a href="#函数、指针和数组" class="headerlink" title="函数、指针和数组"></a>函数、指针和数组</h2><h3 id="将数组信息传递给函数"><a href="#将数组信息传递给函数" class="headerlink" title="将数组信息传递给函数"></a>将数组信息传递给函数</h3><p>假设要编写一个处理数组的函数，该函数返回数组中所有元素之和，待处理的是名为marbles的int类型数组。</p>
+<p>首先定义函数原型：注意，数组名是该数组首元素的地址，所以应该把它赋给一个指针类型的参数，即该形参是一个指向int的指针。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">sum</span><span class="params">(<span class="keyword">int</span> * ar)</span></span>; <span class="comment">// 函数原型</span></span><br></pre></td></tr></table></figure>
+
+<p>sum()从该参数获得了什么信息？它获得了该数组首元素的地址，知道要在该位置上找出一个int。注意，该参数并未包含数组元素个数的信息。 我们有两种方法让函数获得这一信息：</p>
+<ul>
+<li><p><strong>传递数组的大小：</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 第1个形参告诉函数该数组的地址和数据类型，第2个形参告诉函数该数组中元素的个数</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">sum</span><span class="params">(<span class="keyword">int</span> * ar, <span class="keyword">int</span> n)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">int</span> i;</span><br><span class="line">  <span class="keyword">int</span> total = <span class="number">0</span>;</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; n; i++)</span><br><span class="line">    total += ar[i];        <span class="comment">// ar[i]等于*(ar + 1)</span></span><br><span class="line">  <span class="keyword">return</span> total;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>传递数组的开始和结尾指针：</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">sum</span><span class="params">(<span class="keyword">int</span> * start, <span class="keyword">int</span> * <span class="built_in">end</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">int</span> total = <span class="number">0</span>;</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">while</span> (start &lt; <span class="built_in">end</span>)</span><br><span class="line">  &#123;</span><br><span class="line">    total += *start;</span><br><span class="line">    start++;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> total;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>还可以把循环体压缩成一行代码：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">total += *start++;    <span class="comment">//先指向位置上的值，将值加到total上，然后递增指针</span></span><br></pre></td></tr></table></figure>
+
+<p>一元运算符<code>*</code>和<code>++</code>的优先级相同，但结合律是从右往左，所以<code>start++</code>先求值，然后才是<code>*start</code>。也就是说，是start被递增，而不是*start被递增。</p>
+<p><strong>注意，如果写成<code>*++start</code>，则是先递增指针，再使用指针指向位置上的值;如果写成<code>(*start)++</code>，则先指向位置上的值，然后递增改值，将递增后的值加到total上。下面的程序演示了这些优先级情况</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> date[<span class="number">2</span>] = &#123;<span class="number">100</span>, <span class="number">200</span>&#125;;</span><br><span class="line">    <span class="keyword">int</span> moredata[<span class="number">2</span>] = &#123;<span class="number">300</span>, <span class="number">400</span>&#125;;</span><br><span class="line">    <span class="keyword">int</span> * p1, * p2, * p3;</span><br><span class="line"></span><br><span class="line">    p1 = p2 = date;</span><br><span class="line">    p3 = moredata;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"  *p1 = %d,    *p2 = %d,     *p3 = %d\n"</span>, *p1, *p2, *p3);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"*p1++ = %d,  *++p2 = %d, (*p3)++ = %d\n"</span>, *p1++, *++p2, (*p3)++);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"  *p1 = %d,    *p2 = %d,     *p3 = %d\n"</span>, *p1, *p2, *p3);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">  *p1 = 100,    *p2 = 100,     *p3 = 300</span></span><br><span class="line"><span class="comment">*p1++ = 100,  *++p2 = 200, (*p3)++ = 300</span></span><br><span class="line"><span class="comment">  *p1 = 200,    *p2 = 200,     *p3 = 301</span></span><br><span class="line"><span class="comment">  </span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<p>所以，为了使提高程序可读性，避免出错，通常将<code>*start++</code>    写成<code>*(start++)</code>。</p>
+</li>
+</ul>
+<blockquote>
+<p><strong>注意 声明数组形参</strong></p>
+<p>在函数原型或函数定义头中，可以用int ar[]代替int * ar：</p>
+<p>int sum(int ar[], int n);</p>
+<p>int sum(int [], int);</p>
+<p>int <em>ar形式和int ar[]形式都表示ar是一个指向int的指针。但是，*</em>int ar[]只能用于声明形式参数**。第2种形式(int ar[]) 提醒读者指针ar指向的不仅仅 一个int类型值，还是一个int类型数组的元素。因为数组名是该数组首元素的地址，作为实际参数的数组名要求形式参数是一个与之匹配的指针。只有在这种情况下，C才会把int ar[]和int * ar解释成一样。</p>
+</blockquote>
+<h2 id="指针操作"><a href="#指针操作" class="headerlink" title="指针操作"></a>指针操作</h2><ul>
+<li><strong>赋值</strong>：可以把地址赋给指针。例如，用数组名、带地址运算符(&amp;)的变量名、另一个指针进行赋值;</li>
+<li><strong>解引用(dereferencing)</strong>：<code>*</code>运算符给出指针指向地址上储存的值;</li>
+<li><strong>取址</strong>：和所有变量一样，指针变量也有自己的地址和值。对指针而言， &amp;运算符给出指针本身的地址。</li>
+<li><strong>指针与整数相加</strong>：可以使用+运算符把指针与整数相加，或整数与指针相加。无论哪种情况，整数都会和指针所指向类型的大小（以字节为单位） 相乘，然后把结果与初始地址相加。因此ptr1 + 4与&amp;part1[4]等价；</li>
+<li><strong>递增指针</strong>：递增指向数组元素的指针可以让该指针移动至数组的下一个元素，与指针与整数1相加等效；</li>
+<li><strong>指针与整数相减</strong>：可以使用-运算符从一个指针中减去一个整数。<strong>指针必须是第1个运算对象，整数是第 2 个运算对象</strong>。该整数将乘以指针指向类型的大小（以字节为单位），然后用初始地址减去乘积。</li>
+<li>递减指针：当然，除了递增指针还可以递减指针，前缀或后缀的递增和递减运算 符都可以使用；</li>
+<li><strong>指针求差</strong>：可以计算两个指针的差值。通常，求差的两个指针分别指向同一个数组的不同元素，通过计算求出两元素之间的距离。差值的单位与数组类型的单位相同。比如<code>&amp;arr[3] - &amp;arr[1] = 2</code>；</li>
+<li><strong>比较</strong>：使用关系运算符可以比较两个指针的值，前提是两个指针都指向相同类型的对象。</li>
+</ul>
+<h3 id="array、pointer和-、–"><a href="#array、pointer和-、–" class="headerlink" title="array、pointer和++、–"></a>array、pointer和++、–</h3><p>array和pointer的值都是数组的第一个元素的地址，但是<strong>pointer可以使用++和–运算符而array不可以</strong>。</p>
+<p>在声明数组的时候，虽然编译器把array识别为数组首元素的地址(&amp;array[0])的别名(alias)，但是<strong>array是地址常量(const)</strong>，不能更改array。如果更改了array1，则意味改变了数组的地址。但是可以进行类型ar+1这样的操作，这个表达式的值是数组下一个元素的地址。递增运算符只能用于变量名，不能用于常量，所以不能使用++array。</p>
+<p>在声明指针的时候，指针指向数组首元素的储存位置。但是指针是变量，其值可以改变，所以可以使用++pointer表示数组下一个元素的地址。</p>
+<h2 id="保护数组中的数据"><a href="#保护数组中的数据" class="headerlink" title="保护数组中的数据"></a>保护数组中的数据</h2><h3 id="在函数中保护数组数据"><a href="#在函数中保护数组数据" class="headerlink" title="在函数中保护数组数据"></a>在函数中保护数组数据</h3><p>编写一个处理基本类型（如，int）的函数时，要选择是传递int类型的值还是传递指向int的指针。通常都是直接传递数值，只有程序需要在函数中改变该数值时，才会传递指针。对于数组别无选择，必须传递指针。传递指针会导致一些问题：编程错误可能会破坏原始数据。ANSI C提供了一种预防手段。如果函数的意图不是修改数组中的数据内容，那么在函数原型和函数定义中声明形式参数时应使用关键字const。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">sum</span><span class="params">(<span class="keyword">const</span> <span class="keyword">int</span> * ar, <span class="keyword">int</span> n)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">sum</span><span class="params">(<span class="keyword">const</span> <span class="keyword">int</span> *ar, <span class="keyword">int</span> n)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">int</span> i;</span><br><span class="line">  <span class="keyword">int</span> total = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; n; i++)</span><br><span class="line">    total += arr[i];</span><br><span class="line">  <span class="keyword">return</span> total;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>const</code>告诉编译器，该函数不能修改ar指向的数组中的内容。如果在函数中不小心使用类似ar[i]++的表达式，编译器会捕获这个错误，并生成一条错误信息。这里一定要理解，这样使用const并不是要求原数组是常量，而是该函 数在处理数组时将其视为常量，不可更改。</p>
+<h3 id="const的其他作用"><a href="#const的其他作用" class="headerlink" title="const的其他作用"></a>const的其他作用</h3><ul>
+<li><p>声明只读数组，如果程序尝试改变数组元素的值，编译器将生成一个错误；</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> days[<span class="number">12</span>] = &#123;<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>,<span class="number">7</span>,<span class="number">8</span>,<span class="number">9</span>,<span class="number">10</span>,<span class="number">11</span>,<span class="number">12</span>&#125;;</span><br><span class="line">days[<span class="number">10</span>] = <span class="number">11</span>;  <span class="comment">// 编译错误</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>声明<strong>不可用于改变指向值的指针</strong>：无论是使用指针表示法还是数组表示法，都不允许使用pd修改它所指向 数据的值。但是要注意，因为rates并未被声明为const，所以仍然可以通过 rates修改元素的值；</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">double</span> rates[<span class="number">5</span>] = &#123;<span class="number">88.99</span>, <span class="number">100.12</span>, <span class="number">59.34</span>, <span class="number">183.22</span>, <span class="number">343.23</span>&#125;;</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">double</span> * pd = rate;</span><br><span class="line">*pd = <span class="number">100.1</span>;      <span class="comment">// 编译错误</span></span><br><span class="line">pd[<span class="number">2</span>] = <span class="number">222.2</span>；   <span class="comment">// 编译错误</span></span><br><span class="line">rate2[<span class="number">2</span>] = <span class="number">99.99</span>; <span class="comment">// 允许，因为rates没有被const限定</span></span><br></pre></td></tr></table></figure>
+
+<p>关于指针赋值和const需要注意一些规则。首先，把const数据或非const 数据的地址赋值给const的指针是允许的：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">double</span> rates[<span class="number">5</span>] = &#123;<span class="number">88.99</span>, <span class="number">100.12</span>, <span class="number">59.34</span>, <span class="number">183.22</span>, <span class="number">343.23</span>&#125;;</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">double</span> locked[<span class="number">5</span>] = &#123;<span class="number">1.0</span>, <span class="number">2.0</span>, <span class="number">3.0</span>, <span class="number">4.0</span>, <span class="number">5.0</span>&#125;;</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">double</span> * pc = rates;</span><br><span class="line">pc = rates;   <span class="comment">// 允许 </span></span><br><span class="line">pc = locked; <span class="comment">// 允许</span></span><br></pre></td></tr></table></figure>
+
+<p>但是，只能把非const数据的地址赋给普通指针(非const)。这个规则非常合理。否则，通过指针就能改变const数组中的数据。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">double</span> rates[<span class="number">5</span>] = &#123;<span class="number">88.99</span>, <span class="number">100.12</span>, <span class="number">59.34</span>, <span class="number">183.22</span>, <span class="number">343.23</span>&#125;;</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">double</span> locked[<span class="number">5</span>] = &#123;<span class="number">1.0</span>, <span class="number">2.0</span>, <span class="number">3.0</span>, <span class="number">4.0</span>, <span class="number">5.0</span>&#125;;</span><br><span class="line"><span class="keyword">double</span> * pnc = rates;</span><br><span class="line">pnc = rates;   <span class="comment">// 允许 </span></span><br><span class="line">pnc = locked; <span class="comment">// 不允许</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>声明并初始化一个<strong>不能指向别处的指针(但是可以修改指向的值)</strong>，与声明“不可用于改变值的指针”的差别在于const的位置。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">double</span> rates[<span class="number">5</span>] = &#123;<span class="number">88.99</span>, <span class="number">100.12</span>, <span class="number">59.34</span>, <span class="number">183.22</span>, <span class="number">343.23</span>&#125;;</span><br><span class="line"><span class="keyword">double</span> <span class="keyword">const</span> * pc = rates;</span><br><span class="line">pc = &amp;rates[<span class="number">2</span>]; <span class="comment">// 不允许</span></span><br><span class="line">*pc = <span class="number">92.99</span>;    <span class="comment">// 允许</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>声明既不能修改地址也不能修改地址上的指的指针（使用两次const）</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">double</span> rates[<span class="number">5</span>] = &#123;<span class="number">88.99</span>, <span class="number">100.12</span>, <span class="number">59.34</span>, <span class="number">183.22</span>, <span class="number">343.23</span>&#125;;</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">double</span> <span class="keyword">const</span> * pc = rates;</span><br><span class="line">pc = &amp;rates[<span class="number">2</span>]; <span class="comment">// 不允许</span></span><br><span class="line">*pc = <span class="number">92.99</span>;    <span class="comment">// 不允许</span></span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ul>
+<h2 id="指针与多维数组"><a href="#指针与多维数组" class="headerlink" title="指针与多维数组"></a>指针与多维数组</h2><p>假设有下面的声明：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> zippo[<span class="number">4</span>][<span class="number">2</span>];</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>因为<code>zippo</code>是数组首元素的地址，所以<code>zippo</code>的值和<code>&amp;zippo[0]</code>的值相同。 而<code>zippo[0]</code>本身是一个内含两个整数的数组，所以<code>zippo[0]</code>的值和它首元素 （一个整数）的地址（即<code>&amp;zippo[0][0]</code>的值）相同。简而言之，<code>zippo[0]</code>是一 个占用一个int大小对象的地址，而<code>zippo</code>是一个占用两个int大小对象的地址。<strong>由于这个整数和内含两个整数的数组都开始于同一个地址，所以zippo 和zippo[0]的值相同。</strong></p>
+<p><code>zippo = &amp;zippo[0]</code></p>
+<p><code>zippo[0] = &amp;zippo[0][0]</code></p>
+</li>
+<li><p>给指针或地址加1，其值会增加对应类型大小的数值。在这方面，zippo 和zippo[0]不同，因为zippo指向的对象占用了两个int大小，而zippo[0]指向的对象只占用一个int大小。</p>
+</li>
+<li><p>因为<code>zippo[0]</code>是该数组首元素<code>zippo[0][0]</code>的地址，所以<code>*(zippo[0])</code>表示储存在<code>zippo[0][0]</code>上的值（int类型值）。与此类似，<code>*zippo</code>代表该数组首元素<code>zippo[0]</code>的值，但是 <code>zippo[0]</code>本身是一个int类型值的地址。该值的地址是<code>&amp;zippo[0][0]</code>，所以 <code>*zippo</code>就是<code>&amp;zippo[0][0]</code>。对两个表达式应用解引用运算符表明，<code>**zippo = *&amp;zippo[0][0] = zippo[0][0]</code>，即一个int类型的值。简而言之，<code>zippo</code>是地址的地址，必须解引用两次才能获得原始值。</p>
+<p><code>*zippo = zippo[0] = &amp;zippo[0][0]</code></p>
+<p><code>**zippo= *zippo[0] = zippo[0][0]</code></p>
+</li>
+<li><p><code>zippo</code>是一个二位数组，所以需要对数组名解引用2次才能获得数组中的值，使用两个<code>*</code>运算符或<code>[]</code>都可以实现：<code>zippo[2][1] = *(*(zippo + 2) + 1)</code>。</p>
+<p><img src="https://gitee.com/Carlisle345748/cloudimg/raw/master/img/%E8%8E%B7%E5%8F%96%E4%BA%8C%E7%BB%B4%E6%95%B0%E7%BB%84%E7%9A%84%E5%80%BC.png" alt="获取二维数组的值"></p>
+</li>
+</ul>
+<img src="https://gitee.com/Carlisle345748/cloudimg/raw/master/img/数组的数组中的地址.png" alt="/数组的数组中的地址" style="zoom:50%;" />
+
+<h3 id="声明一个指向多维数组的指针"><a href="#声明一个指向多维数组的指针" class="headerlink" title="声明一个指向多维数组的指针"></a>声明一个指向多维数组的指针</h3><p>处理类似zippo这样的二维数组时，把指针声明为指向int的类型还不够。因为指向int只能与zippo[0]的类型匹配，说明该指针指向一个int类型的值。但是zippo是它首元素的地址，该元素是一个内含两个int类型值的一维数组。因此，pz必须指向一个内含两个int类型值的数组，而不是指向一个int类型值。具体的声明方式如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> (*pz)[<span class="number">2</span>]; <span class="comment">// pz指向一个含有两个int数值的数组，正确</span></span><br></pre></td></tr></table></figure>
+
+<p>为什么要在声明中使用<code>()</code>？因为<code>[]</code>的优先级高于<code>*</code>，考虑以下声明语句：<code>[2]</code>先与<code>pax</code>结合，<code>pax</code>成为一个含有两个元素的数组，然后<code>*</code>表示pax数组内含有2个指针，最后int表示pax数组中的指针指向int类型。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> *pax[<span class="number">2</span>]; <span class="comment">// pax是一个含有两个指向int类型指针的数组，错误</span></span><br></pre></td></tr></table></figure>
+
+<p>下面的例子演示如何使用指向二维数组的指针</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> zippo[<span class="number">4</span>][<span class="number">2</span>] = &#123;&#123;<span class="number">2</span>,<span class="number">4</span>&#125;,&#123;<span class="number">3</span>,<span class="number">5</span>&#125;,&#123;<span class="number">1</span>,<span class="number">2</span>&#125;,&#123;<span class="number">5</span>,<span class="number">6</span>&#125;&#125;;</span><br><span class="line">    <span class="keyword">int</span> (*pz)[<span class="number">2</span>];</span><br><span class="line"></span><br><span class="line">    pz = zippo;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"   pz = %p,    pz + 1 = %p\n"</span>, pz, pz + <span class="number">1</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"pz[0] = %p, pz[0] + 1 = %p\n"</span>, pz[<span class="number">0</span>], pz[<span class="number">0</span>] + <span class="number">1</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"  *pz = %p,   *pz + 1 = %p\n"</span>, *pz, *pz + <span class="number">1</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"   pz[0][0] = %d,   *pz[0] = %d,  **pz = %d\n"</span>, pz[<span class="number">0</span>][<span class="number">0</span>], *pz[<span class="number">0</span>], **pz);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"   pz[2][1] = %d,    *(*(pz + 2) + 1) = %d\n"</span>, pz[<span class="number">2</span>][<span class="number">1</span>], *(*(pz + <span class="number">2</span>) + <span class="number">1</span>));</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"zippo[2][1] = %d, *(*(zippo + 2) + 1) = %d\n"</span>, zippo[<span class="number">2</span>][<span class="number">1</span>], *(*(zippo + <span class="number">2</span>) + <span class="number">1</span>));</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">   pz = 0x7ffee60595e0,    pz + 1 = 0x7ffee60595e8</span></span><br><span class="line"><span class="comment">pz[0] = 0x7ffee60595e0, pz[0] + 1 = 0x7ffee60595e4</span></span><br><span class="line"><span class="comment">  *pz = 0x7ffee60595e0,   *pz + 1 = 0x7ffee60595e4</span></span><br><span class="line"><span class="comment">   pz[0][0] = 2,   *pz[0] = 2,  **pz = 2</span></span><br><span class="line"><span class="comment">   pz[2][1] = 2,    *(*(pz + 2) + 1) = 2</span></span><br><span class="line"><span class="comment">zippo[2][1] = 2, *(*(zippo + 2) + 1) = 2</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<p>虽然<code>pz</code>是一个指针，不是数组名，但是也可以使用 <code>pz[2][1]</code>这样的写法。可以用数组表示法或指针表示法来表示一个数组元素，既可以使用数组名，也可以使用指针名：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">zippo[m][n] = *(*(zippo + m) + n);</span><br><span class="line">pz[m][n] = *(*(pz + m) + n);</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="指针类型的兼容性"><a href="#指针类型的兼容性" class="headerlink" title="指针类型的兼容性"></a>指针类型的兼容性</h3><p>指针之间的赋值比数值类型之间的赋值要严格。例如，不用类型转换就可以把 int 类型的值赋给double类型的变量，但是两个类型的指针不能这样做。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> n = <span class="number">5</span>;</span><br><span class="line"><span class="keyword">double</span> x;</span><br><span class="line"><span class="keyword">int</span> * pi = &amp;n;</span><br><span class="line"><span class="keyword">double</span> * pd = &amp;x;</span><br><span class="line">x = n;   <span class="comment">// 允许</span></span><br><span class="line">pi = pd; <span class="comment">// 不允许,pi是pointer-to-int,pd是pointer-to-double</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> * pt;</span><br><span class="line"><span class="keyword">int</span> (*pa)[<span class="number">3</span>];    <span class="comment">// pointer-to-int[3]</span></span><br><span class="line"><span class="keyword">int</span> ar1[<span class="number">2</span>][<span class="number">3</span>];</span><br><span class="line"><span class="keyword">int</span> ar2[<span class="number">3</span>][<span class="number">2</span>];</span><br><span class="line"><span class="keyword">int</span> **p2;        <span class="comment">// pointer-to-pointer-to-int</span></span><br><span class="line"></span><br><span class="line">pt = &amp;ar1[<span class="number">0</span>][<span class="number">0</span>]; <span class="comment">// pointer-to-int</span></span><br><span class="line">pt = ar1[<span class="number">0</span>];     <span class="comment">// pointer-to-int</span></span><br><span class="line">pt = ar1;        <span class="comment">// not valid, ar1 is pointer-to-int[3]</span></span><br><span class="line">pa = ar1;        <span class="comment">// pointer-to-int[3]</span></span><br><span class="line">pa = ar2;        <span class="comment">// not valid, ar2 is pointer-to-int[2]</span></span><br><span class="line">p2 = &amp;pt;        <span class="comment">// pointer-to-pointer</span></span><br><span class="line">*p2 = ar2[<span class="number">0</span>];    <span class="comment">// pointer-to-int</span></span><br><span class="line">p2 = ar2;        <span class="comment">// not valid, ar2 i pointer-to-int[2]</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> x = <span class="number">20</span>;</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> y = <span class="number">23</span>;</span><br><span class="line"><span class="keyword">int</span> * p1 = &amp;x;</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> * p2 = &amp;y;</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> ** pp2;</span><br><span class="line"></span><br><span class="line">p1 = p2;    <span class="comment">// 不安全，const指针赋给非const指针</span></span><br><span class="line">p2 = p1;    <span class="comment">// 安全，把非const指针赋给const指针</span></span><br><span class="line">pp2 = &amp;p1;  <span class="comment">// 不安全，嵌套指针类型赋值</span></span><br></pre></td></tr></table></figure>
+
+<p>前面提到过，把const指针赋给非const指针不安全，因为这样可以使用新的指针改变const指针指向的数据。编译器在编译代码时，可能会给出警告，执行这样的代码是未定义的。但是把非const指针赋给const指针没问题，前提是只进行一级解引用<code>p2 = p1</code>。进行两集解引用的时候，这样赋值也不安全。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> ** pp2;</span><br><span class="line"><span class="keyword">int</span> * p1;</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> n = <span class="number">13</span>;</span><br><span class="line">pp2 = &amp;p1;  <span class="comment">// 允许，但是pp2的const限定符失效，因为p1非const</span></span><br><span class="line">*pp2 = &amp;n;  <span class="comment">// 允许，两者都声明为const，但是这导致p1指向n</span></span><br><span class="line">*p1 = <span class="number">10</span>;   <span class="comment">// 允许，但是这将改变n的值</span></span><br></pre></td></tr></table></figure>
+
+<p>pp2指向p1，p1指向n。pp2和n为const，但是p1非const。C标准规定了通过非const指针更改const数据是未定义的行为。例如，在Terminal中（OS X对底层UNIX系统的访问）使用gcc编译包含以上代码的程序，导致n最终的值是13，但是在相同系统下使用 clang来编译，n最终的值是10。两个编译器都给出指针类型不兼容的警告。</p>
+<blockquote>
+<p>C const和C++ const</p>
+<p>C和C++中const的用法很相似，但是并不完全相同。区别之一是， C++允许在声明数组大小时使用const整数，而C却不允许。区别之二是， C++的指针赋值检查更严格：</p>
+<p>const int y;</p>
+<p>const int * p2 = &y;</p>
+<p>int * p1;</p>
+<p>p1 = p2;   // C++中不允许这样做，但是C可能只给出警告</p>
+<p>C++不允许把const指针赋给非const指针。而C则允许这样做，但是如果通过p1更改y，其行为是未定义的。</p>
+</blockquote>
+<h3 id="函数和多维数组"><a href="#函数和多维数组" class="headerlink" title="函数和多维数组"></a>函数和多维数组</h3><p>声明函数原型和定义函数：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 二维数组</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">somefuntion</span><span class="params">(<span class="keyword">int</span>(*pt)[<span class="number">4</span>])</span></span>;     <span class="comment">// 多维函数指针作为形参</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">somefuntion2</span><span class="params">(<span class="keyword">int</span> pt[][<span class="number">4</span>])</span></span>;    <span class="comment">// 当且仅当pt是函数的形参时，可以这样声明</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">somefuntion</span><span class="params">(<span class="keyword">int</span>(*pt)[<span class="number">4</span>])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  some code;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">somefuntion</span><span class="params">(<span class="keyword">int</span> pt[][<span class="number">4</span>])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  some code;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>注意，下面的声明不正确：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">sum</span><span class="params">(<span class="keyword">int</span> ar[][], <span class="keyword">int</span> rows)</span></span>;  <span class="comment">// 错误声明</span></span><br></pre></td></tr></table></figure>
+
+<p>编译器会把数组表示法转换成指针表示法。例如，编译器会把 <code>ar[1]</code>转换成<code>ar+1</code>。编译器对<code>ar+1</code>求值，要知道<code>ar</code>所指向的对象大小。下面的声明：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">sum</span><span class="params">(<span class="keyword">int</span> ar[][<span class="number">4</span>], <span class="keyword">int</span> rows)</span></span>;  <span class="comment">// 有效声明</span></span><br></pre></td></tr></table></figure>
+
+<p>表示ar指向一个内含4个int类型值的数组（在我们的系统中，<code>ar</code>指向的对象占16字节），所以<code>ar+1</code>的意思是“该地址加上16字节”。如果第2对方括号是空的，编译器就不知道该怎样处理。也可以在第1对方括号中写上大小，如下所示，但是编译器会忽略该值：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">sum</span><span class="params">(<span class="keyword">int</span> ar[<span class="number">3</span>][<span class="number">4</span>], <span class="keyword">int</span> rows)</span></span>;  <span class="comment">// 有效声明，但是3会被忽略</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>声明一个指向N维数组的指针时，只能省略最左边方括号中的值：</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">sum4d</span><span class="params">(<span class="keyword">int</span> ar[][<span class="number">12</span>][<span class="number">20</span>][<span class="number">30</span>], <span class="keyword">int</span> rows)</span></span>;    <span class="comment">// 等价于下式</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">sum4d</span><span class="params">(<span class="keyword">int</span> (*ar)[<span class="number">12</span>][<span class="number">20</span>][<span class="number">30</span>], <span class="keyword">int</span> rows)</span></span>;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="复合字面量-compound-literals"><a href="#复合字面量-compound-literals" class="headerlink" title="复合字面量(compound literals)"></a>复合字面量(compound literals)</h2><p>假设给带int类型形参的函数传递一个值，要传递int类型的变量，但是也可以传递int类型常量，如5。在C99 标准以前，对于带数组形参的函数，可以传递数组，但是没有等价的数组常量。C99新增了复合字面量 （compound literal）。字面量是除符号常量外的常量。例如，5是int类型字 面量， 81.3是double类型的字面量，’Y’是char类型的字面量，”elephant”是字符串字面量。发布C99标准的委员会认为，如果有代表数组和结构内容的复合字面量，在编程时会更方便。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> diva[<span class="number">2</span>] = &#123;<span class="number">10</span>, <span class="number">20</span>&#125;;  <span class="comment">// 普通数组声明；</span></span><br><span class="line"></span><br><span class="line">(<span class="keyword">int</span> [<span class="number">2</span>])&#123;<span class="number">10</span>, <span class="number">20</span>&#125;;       <span class="comment">// 复合字面量(compound literals)，int [2]即是复合字面量的类型名</span></span><br><span class="line">(<span class="keyword">int</span> [])&#123;<span class="number">50</span>, <span class="number">70</span>, <span class="number">90</span>&#125;     <span class="comment">// 与普通数组初始化一样，也可以让编译器自动计算数组大小</span></span><br></pre></td></tr></table></figure>
+
+<p>因为复合字面量是<strong>匿名的</strong>，所以不能先创建然后再使用它，必须在创建的同时使用它。使用指针记录地址就是一种用法：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> * pt1;</span><br><span class="line">pt1 = (<span class="keyword">int</span>[<span class="number">2</span>])&#123;<span class="number">10</span>, <span class="number">20</span>&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>与有数组名的数组类似，复合字面量的类型名也代表首元素的地址，所以可以把它赋给指向int的指针，然后便可使用这个指针。例如，<code>*pt1</code>是10，<code>pt1[1]</code>是20。</p>
+<p>还可以把复合字面量作为实际参数传递给带有匹配形式参数的函数：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">sum</span><span class="params">(<span class="keyword">const</span> <span class="keyword">int</span> ar[], <span class="keyword">int</span> n)</span></span>;</span><br><span class="line">...</span><br><span class="line"><span class="keyword">int</span> total;</span><br><span class="line">total = sum((<span class="keyword">int</span>[]&#123;<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>&#125;, <span class="number">5</span>);</span><br></pre></td></tr></table></figure>
+
+<p>第1个实参是内含6个int类型值的数组，和数组名类似，这同时也是该数组首元素的地址。这种用法的好处是，把信息传入函数前不必先创建数组，这是复合字面量的典型用法。</p>
+<p>可以把这种用法应用于二维数组或多维数组。例如，下面的代码演示了如何创建二维int数组并储存其地址：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> (*pt2)[<span class="number">4</span>];</span><br><span class="line">pt2 = (<span class="keyword">int</span>[<span class="number">2</span>][<span class="number">4</span>])&#123;&#123;<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>&#125;,&#123;<span class="number">5</span>,<span class="number">6</span>,<span class="number">7</span>,<span class="number">8</span>&#125;&#125;;</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/06/13/%E9%87%8D%E5%AE%9A%E5%90%91%E8%BE%93%E5%85%A5%E8%BE%93%E5%87%BA/" rel="prev" title="重定向输入输出">
+      <i class="fa fa-chevron-left"></i> 重定向输入输出
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/06/13/%E5%AD%97%E7%AC%A6%E4%B8%B2/" rel="next" title="字符串">
+      字符串 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#数组"><span class="nav-number">1.</span> <span class="nav-text">数组</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#初始化数组"><span class="nav-number">1.1.</span> <span class="nav-text">初始化数组</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#指定初始化器-Desinated-Initializers"><span class="nav-number">1.1.1.</span> <span class="nav-text">指定初始化器(Desinated Initializers)</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#指定初始化器的两个重要特性："><span class="nav-number">1.1.1.1.</span> <span class="nav-text">指定初始化器的两个重要特性：</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#数组赋值"><span class="nav-number">1.2.</span> <span class="nav-text">数组赋值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#数组边界"><span class="nav-number">1.3.</span> <span class="nav-text">数组边界</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#指定数组的大小"><span class="nav-number">1.4.</span> <span class="nav-text">指定数组的大小</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#多维数组"><span class="nav-number">2.</span> <span class="nav-text">多维数组</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#初始化多维数组"><span class="nav-number">2.0.1.</span> <span class="nav-text">初始化多维数组</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#指针和数组"><span class="nav-number">3.</span> <span class="nav-text">指针和数组</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#数组中的指针运算"><span class="nav-number">3.1.</span> <span class="nav-text">数组中的指针运算</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#数组表示法和指针表示法"><span class="nav-number">3.2.</span> <span class="nav-text">数组表示法和指针表示法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#函数、指针和数组"><span class="nav-number">4.</span> <span class="nav-text">函数、指针和数组</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#将数组信息传递给函数"><span class="nav-number">4.1.</span> <span class="nav-text">将数组信息传递给函数</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#指针操作"><span class="nav-number">5.</span> <span class="nav-text">指针操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#array、pointer和-、–"><span class="nav-number">5.1.</span> <span class="nav-text">array、pointer和++、–</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#保护数组中的数据"><span class="nav-number">6.</span> <span class="nav-text">保护数组中的数据</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#在函数中保护数组数据"><span class="nav-number">6.1.</span> <span class="nav-text">在函数中保护数组数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#const的其他作用"><span class="nav-number">6.2.</span> <span class="nav-text">const的其他作用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#指针与多维数组"><span class="nav-number">7.</span> <span class="nav-text">指针与多维数组</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#声明一个指向多维数组的指针"><span class="nav-number">7.1.</span> <span class="nav-text">声明一个指向多维数组的指针</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#指针类型的兼容性"><span class="nav-number">7.2.</span> <span class="nav-text">指针类型的兼容性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#函数和多维数组"><span class="nav-number">7.3.</span> <span class="nav-text">函数和多维数组</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#复合字面量-compound-literals"><span class="nav-number">8.</span> <span class="nav-text">复合字面量(compound literals)</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">崔梓坤</p>
+  <div class="site-description" itemprop="description">我的计算机学习经历和笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">15</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">崔梓坤</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

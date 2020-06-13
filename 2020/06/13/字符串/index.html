@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="表示字符串和字符串I&#x2F;O初始化字符串 字符串字面量(string literals) 用双引号括起来的内容称为字符串字面量（string literal），也叫作字符串常量（string constant）。双引号中的字符加上编译器自动加入末尾的\0字符，组成字符串储存在内存中。 1234char str[23] &#x3D; &quot;I am a symbolic string&quot;;&#x2F;&#x2F; 如果字符串字面量之间没有">
+<meta property="og:type" content="article">
+<meta property="og:title" content="字符串">
+<meta property="og:url" content="http://yoursite.com/2020/06/13/%E5%AD%97%E7%AC%A6%E4%B8%B2/index.html">
+<meta property="og:site_name" content="崔梓坤的个人博客">
+<meta property="og:description" content="表示字符串和字符串I&#x2F;O初始化字符串 字符串字面量(string literals) 用双引号括起来的内容称为字符串字面量（string literal），也叫作字符串常量（string constant）。双引号中的字符加上编译器自动加入末尾的\0字符，组成字符串储存在内存中。 1234char str[23] &#x3D; &quot;I am a symbolic string&quot;;&#x2F;&#x2F; 如果字符串字面量之间没有">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://gitee.com/Carlisle345748/cloudimg/raw/master/img/%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%95%B0%E7%BB%84%E5%A4%A7%E5%B0%8F%E5%A4%A7%E4%BA%8E%E5%88%9D%E5%A7%8B%E5%8C%96%E7%94%A8%E7%9A%84%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%B8%B8%E9%87%8F.png">
+<meta property="og:image" content="https://gitee.com/Carlisle345748/cloudimg/raw/master/img/%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%8C%87%E9%92%88%E6%95%B0%E7%BB%84%E5%92%8C%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%95%B0%E7%BB%84.png">
+<meta property="article:published_time" content="2020-06-13T10:24:49.000Z">
+<meta property="article:modified_time" content="2020-06-13T10:25:23.386Z">
+<meta property="article:author" content="崔梓坤">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gitee.com/Carlisle345748/cloudimg/raw/master/img/%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%95%B0%E7%BB%84%E5%A4%A7%E5%B0%8F%E5%A4%A7%E4%BA%8E%E5%88%9D%E5%A7%8B%E5%8C%96%E7%94%A8%E7%9A%84%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%B8%B8%E9%87%8F.png">
+
+<link rel="canonical" href="http://yoursite.com/2020/06/13/%E5%AD%97%E7%AC%A6%E4%B8%B2/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>字符串 | 崔梓坤的个人博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">崔梓坤的个人博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/06/13/%E5%AD%97%E7%AC%A6%E4%B8%B2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="崔梓坤">
+      <meta itemprop="description" content="我的计算机学习经历和笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="崔梓坤的个人博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          字符串
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-06-13 18:24:49 / 修改时间：18:25:23" itemprop="dateCreated datePublished" datetime="2020-06-13T18:24:49+08:00">2020-06-13</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="表示字符串和字符串I-O"><a href="#表示字符串和字符串I-O" class="headerlink" title="表示字符串和字符串I/O"></a>表示字符串和字符串I/O</h2><h3 id="初始化字符串"><a href="#初始化字符串" class="headerlink" title="初始化字符串"></a>初始化字符串</h3><ul>
+<li><p><strong>字符串字面量(string literals)</strong></p>
+<p>用双引号括起来的内容称为字符串字面量（string literal），也叫作字符串常量（string constant）。双引号中的字符加上编译器自动加入末尾的\0字符，组成字符串储存在内存中。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">char</span> str[<span class="number">23</span>] = <span class="string">"I am a symbolic string"</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 如果字符串字面量之间没有间隔，或者用空白字符分隔，C会将其视为串联起来的字符串字面量</span></span><br><span class="line"><span class="keyword">char</span> str_s[<span class="number">23</span>] = <span class="string">"I"</span> <span class="string">"am"</span> <span class="string">"a"</span> <span class="string">"symbolic"</span> <span class="string">"string"</span>;</span><br></pre></td></tr></table></figure>
+
+<p>字符串常量属于静态存储类别（static storage class），这说明如果在函数中使用字符串常量，即使函数被调用多次，在整个程序的运行过程中该字符串只会被储存一次。</p>
+</li>
+<li><p><strong>字符串数字和初始化</strong></p>
+<p>在使用{}初始化字符串数组中，要在最后加上空字符<code>/0</code>，否则声明的字符数组而不是字符串数组。在指定数组大小时，要确保数组的元素个数至少比字符串长度多1，所有未被使用的元素都被自动初始化为<code>\0</code>。与数组类型，也可以让编译器自己计算数组的大小。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">char</span> greet[<span class="number">6</span>] = <span class="string">"Hello"</span>;</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">char</span> greet[<span class="number">6</span>] = &#123;<span class="string">'H'</span>, <span class="string">'e'</span>, <span class="string">'l'</span>, <span class="string">'l'</span>, <span class="string">'o'</span>, <span class="string">'\0'</span>&#125;; <span class="comment">// 注意最后要加\0</span></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">char</span> greet[] = <span class="string">"Hello"</span>;  <span class="comment">// 让编译器计算数组大小，必须初始化才能使用[]</span></span><br><span class="line"><span class="keyword">const</span> chat pets[<span class="number">12</span>] = <span class="string">"nice cat."</span>;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://gitee.com/Carlisle345748/cloudimg/raw/master/img/%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%95%B0%E7%BB%84%E5%A4%A7%E5%B0%8F%E5%A4%A7%E4%BA%8E%E5%88%9D%E5%A7%8B%E5%8C%96%E7%94%A8%E7%9A%84%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%B8%B8%E9%87%8F.png" alt="字符串数组大小大于初始化用的字符串常量"></p>
+</li>
+<li><p><strong>字符串和指针</strong></p>
+<p>字符串数组名、字符串字面量和其他数组名一样，是该字符串储存位置的地址。所以可以使用以下表达式，也可以使用指针表示法创建字符串：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 与其他数组类型，字符串字面量也是指向该字符串储存位置的指针，pt1和ar1都是该字符串的地址</span></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">char</span> * pt1 = <span class="string">"Something is pointting at me."</span>;   <span class="comment">// pt1是一个指向字符串字面量的指针</span></span><br><span class="line"><span class="keyword">char</span> ar1[] = <span class="string">"Something is pointting at me."</span>;   <span class="comment">// ar1是一个字符串数组</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 与其他数组类似的指针操作</span></span><br><span class="line">char car[10] = 'Tata';</span><br><span class="line">car == &amp;car[<span class="number">0</span>];</span><br><span class="line">*car = <span class="string">'T'</span>;</span><br><span class="line">*(car + <span class="number">1</span>) == car[<span class="number">1</span>] == <span class="string">'a'</span>;</span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ul>
+<h3 id="字符串的数组形式和指针形式"><a href="#字符串的数组形式和指针形式" class="headerlink" title="字符串的数组形式和指针形式"></a>字符串的数组形式和指针形式</h3><h3 id="数组形式和指针形式的不同"><a href="#数组形式和指针形式的不同" class="headerlink" title="数组形式和指针形式的不同"></a>数组形式和指针形式的不同</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">char</span> * pt1 = <span class="string">"Something is pointting at me."</span>;   <span class="comment">// pt1是一个指向字符串字面量的指针</span></span><br><span class="line"><span class="keyword">char</span> ar1[] = <span class="string">"Something is pointting at me."</span>;   <span class="comment">// ar1是一个字符串数组</span></span><br></pre></td></tr></table></figure>
+
+<p>数组形式和指针形式有何不同？以上面的代码为例：</p>
+<ul>
+<li><p><strong>数组形式 (ar1[])</strong> 在计算机的内存中分配为一个内含29个元素的数组，每个元素被初始化为字符串字面量对应的字符。通常，字符串字面量都作为可执行文件的一部分储存在数据段中。当把程序载入内存时，也载入了程序中的字符串字面量。因此字符串字面量储存在静态内存中。程序在开始运行时才会为该数组分配内存，然后将字符串字面量中的字符拷贝到数组中。注意，此时字符串有两个副本。一个是在静态内存中的字符串字面量，另一个是储存在ar1数组中的字符串。</p>
+<p>此后，编译器便把数组名ar1识别为该数组首元素地址（&amp;ar1[0]）的别名(alias)。这里关键要理解，在数组形式中，ar1是地址常量。不能更改ar1，如果改变了ar1，则意味着改变了数组的存储位置。可以进行类似 ar1+1这样的操作，标识数组的下一个元素。但是不允许进行++ar1这样的操作。</p>
+</li>
+<li><p><strong>指针形式(*pt1)</strong>也使得编译器在静态内存储存字符串字面量。一旦开始执行程序，它会为指针变量pt1留出一个储存位置，并把字符串的地址储存在pt1中。pt1指向该字符串的首字符， 但是它的值可以改变。因此，可以使用递增运算符。例如，++pt1将指向第 2 个字符 (o)。</p>
+<p>字符串字面量被视为const数据。由于pt1指向这个const数据，所以应该把pt1声明为指向const数据的指针。这意味着不能用pt1改变它所指向的数 据，但是仍然可以改变pt1的值（即pt1指向的位置）。如果把一个字符串字面量拷贝给一个数组，就可以随意改变数据，除非把数组声明为const。</p>
+</li>
+</ul>
+<p><strong>总之，初始化数组把静态存储区的字符串拷贝到数组中，而初始化指针只把字符串的地址拷贝给指针</strong>。下面的例子演示了上述内容：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> MSG <span class="meta-string">"I am special"</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">char</span> ar[] = MSG;</span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">char</span> * pt = MSG;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"Address of \"I am special\" : %p\n"</span>, <span class="string">"I am special"</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"Address ar: %p\n"</span>, ar);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"Address pt: %p\n"</span>, pt);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"Address of MSG: %p\n"</span>, MSG);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"Address of \"I am special\" : %p\n"</span>, <span class="string">"I am special"</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">Address of "I am special" : 0x1038e8f48</span></span><br><span class="line"><span class="comment">Address ar: 0x7ffeec3175fb</span></span><br><span class="line"><span class="comment">Address pt: 0x1038e8f48</span></span><br><span class="line"><span class="comment">Address of MSG: 0x1038e8f48</span></span><br><span class="line"><span class="comment">Address of "I am special" : 0x1038e8f48</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>该程序中，pt和MSG的地址相同，而ar的地址不同，说明pt指向字符串字面量，ar指向一个字符串数组，符合上述说明。</li>
+<li>虽然字符串字面量<code>&quot;I&#39;m special&quot;</code>在程序的两个printf()函数中出现了两次，但是编译器只使用了一个存储位置，而且与MSG的地址相同。编译器可以把多次使用的相同字面量储存在一处或多处。另一个编译器可能在不同的位置储存3个”I’m special”。</li>
+<li>第三，静态数据使用的内存与ar使用的动态内存不同。不仅值不同，特定编译器甚至使用不同的位数表示两种内存。</li>
+</ul>
+<h3 id="数组与指针的不同"><a href="#数组与指针的不同" class="headerlink" title="数组与指针的不同"></a>数组与指针的不同</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">char</span> ar[] = <span class="string">"I am a string"</span>;</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">char</span> * pt = <span class="string">"I am a string"</span>;</span><br><span class="line"></span><br><span class="line">pt = ar; <span class="comment">// 允许，可以把数组的地址赋给指针变量</span></span><br><span class="line">ar = pt; <span class="comment">// 不允许，数组地址是常量</span></span><br></pre></td></tr></table></figure>
+
+<p>这类似于<code>x = 3;</code>和<code>3 = x;</code>的情况。赋值运算符的左侧必须是变量（或概括地说是可修改的左值）</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">char</span> * <span class="keyword">word</span> = <span class="string">"frame"</span>;   <span class="comment">// 未使用const限定符</span></span><br><span class="line"><span class="keyword">word</span>[<span class="number">1</span>] = <span class="string">'k'</span>;           <span class="comment">// 不一定允许，可能触发内存访问错误</span></span><br></pre></td></tr></table></figure>
+
+<p>未使用const限定符的指针初始化后，使用指针修改字符串的行为在C标准中是为定义的。这样的语句可能导致内存访问错误。原因前面提到过，编译器可能把所有完全相同的字符串字面量储存一个位置，而不是多处，使用指针修改字符串字面量可能导致其他地方使用相同的字符串字面量时出错，比如下面的例子 ：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">char</span> * p1 = <span class="string">"Klingon"</span>;</span><br><span class="line">    <span class="comment">// p1[0] = 'F';</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"Klingon"</span>);  </span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">": Beware the %s!\n"</span>, <span class="string">"Klingon"</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Flingon: Beware the Flingons!</span></span><br></pre></td></tr></table></figure>
+
+<p>一些编译器可以运行上述代码，而一些编译器会直接报错。因为编译器可以用相同的地址替换每个”Klingon”实例。如果编译器使用这种单次副本表示法，并允许p1[0]修改’F’，那将影响所有使用该字符串的代码。所以以上语句打印字符串字面量”Klingon”时实际上显示的 是”Flingon”。</p>
+<p><strong>因此，建议在把指针初始化为字符串字面量时使用const限定符。</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">char</span> * pl = <span class="string">"Klingon"</span>;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="字符串的数组"><a href="#字符串的数组" class="headerlink" title="字符串的数组"></a>字符串的数组</h2><p>C语言中可以创建包含字符串的数组，数组中的每个元素都是一个字符串。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> SLEN 40</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> LIM 5</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  	<span class="keyword">int</span> i;</span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">char</span> *mytalents[LIM] = &#123;</span><br><span class="line">        <span class="string">"Adding　numbers　swiftly"</span>, </span><br><span class="line">        <span class="string">"Multiplying　accurately"</span>,</span><br><span class="line">        <span class="string">"Stashing　data"</span>, <span class="string">"Following　instructions　to　the　letter"</span>, </span><br><span class="line">        <span class="string">"Understanding　the　C　language"</span> </span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">char</span> yourtalents[LIM][SLEN] = &#123;</span><br><span class="line">        <span class="string">"Walking　in　a　straight　line"</span>,</span><br><span class="line">        <span class="string">"Sleeping"</span>,</span><br><span class="line">        <span class="string">"Watching　television"</span>,</span><br><span class="line">        <span class="string">"Mailing　letters"</span>,</span><br><span class="line">        <span class="string">"Reading　email"</span></span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">"Let's compare talent."</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"%-36s　 %-25s\n"</span>, <span class="string">"My　Talents"</span>, <span class="string">"Your　Talents"</span>);</span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; LIM; i++)</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"%-36s　 %-25s\n"</span>, mytalents[i], yourtalents[i]);</span><br><span class="line">  	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>mytalents</code>和<code>yourtalents</code>非常相似。两者都代表5个字符串。使用一个下标时都分别表示一个字符串，如<code>mytalents[0]</code>和 <code>yourtalents[0]</code>；使用两个下标时都分别表示一个字符，如<code>mytalents[1][2]</code>和<code>yourtalents[1][2]</code>。</p>
+<p>但是，它们也有区别:</p>
+<ul>
+<li><code>mytalents</code>数组是一个<strong>内含5个指针的数组</strong>，在我们的系统中共占用40字节。<code>mytalents</code>中的指针指向初始化时所用的字符串字面量的位置，这些字符串字面量被储存在静态内存中</li>
+<li><code>yourtalents</code>是一个<strong>内含5个数组的数组</strong>，每个数组内含40个char类型的值，共占用200字节。yourtalents 中的数组储存着字符串字面量的副本，所以每个字符串都被储存了两次。</li>
+</ul>
+<p>所以，虽然<code>mytalents[0]</code>和 <code>yourtalents[0]</code>都分别表示一个字符串，但mytalents和yourtalents的类型并不相同。此外，为字符串数组分配内存的使用率较低。yourtalents 中的每个元素的大小必须相同，而且必须是能储存最长字符串的大小。我们可以把yourtalents想象成矩形二维数组，每行的长度都是40字节； 把mytalents想象成不规则的数组，每行的长度可以不同。</p>
+<img src="https://gitee.com/Carlisle345748/cloudimg/raw/master/img/字符串指针数组和字符串数组.png" alt="字符串指针数组和字符串数组" style="zoom:30%;" />
+
+<h3 id="字符串数组与函数"><a href="#字符串数组与函数" class="headerlink" title="字符串数组与函数"></a>字符串数组与函数</h3><p>在函数的形式参数声明中，比如上面的例子中，包含字符串的数组<code>yourtalents</code>和包含指向字符串的指针的数组<code>mytalents</code>需要使用不同的形式参数类型：</p>
+<ul>
+<li><p>包含字符串的数组</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ROW 10</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> SIZE 40</span></span><br><span class="line"><span class="keyword">char</span> strarr[ROW][SIZE];  <span class="comment">// 包含10个大小为40的字符串数组的数组</span></span><br><span class="line"><span class="function"><span class="keyword">char</span> * <span class="title">myfunction</span><span class="params">(<span class="keyword">char</span> (*str)[SIZE])</span></span>;  <span class="comment">// 形式参数是pointer-to-array of char</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>包含指向字符串的指针的数组</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ROW 10</span></span><br><span class="line"><span class="keyword">char</span> * ptstr[ROW];  <span class="comment">// 包含十个指向字符串的指针的数组</span></span><br><span class="line"><span class="function"><span class="keyword">char</span> * <span class="title">myfunction</span><span class="params">(<span class="keyword">char</span> * str[])</span></span>;  <span class="comment">// 形式参数是pointer-to-pointer-to-char</span></span><br><span class="line"><span class="function"><span class="keyword">char</span> * <span class="title">myfunction</span><span class="params">(<span class="keyword">char</span> **str)</span></span>;  <span class="comment">// 与上式等效</span></span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ul>
+<h2 id="EOF问题"><a href="#EOF问题" class="headerlink" title="EOF问题"></a>EOF问题</h2><p>在linux或Mac系统中，键盘输入<code>ctrl + D</code>可以模拟EOF。但是后续若再想使用scanf()等函数读取stdin的里的数据时，最后的EOF一直无法被消除，无法通过常用的<code>while(ch=getchar()!= &#39;\n&#39; &amp;&amp; ch != EOF);</code>来清除缓冲区中的EOF，最后只能使用<code>setbuf(stdin, NULL)</code>来重置缓冲区。这个问题日后需要再研究研究。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ROW 10</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> SIZE 40</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">char</span> input[ROW][SIZE];</span><br><span class="line">    <span class="keyword">char</span> * ptstr[ROW];</span><br><span class="line">    <span class="keyword">int</span> ct = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">int</span> choice = <span class="number">100</span>;</span><br><span class="line">    <span class="keyword">char</span> ch;</span><br><span class="line">    <span class="keyword">int</span> status;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"Input up to %d lines (EOF) to stop:\n"</span>, ROW);</span><br><span class="line">    <span class="keyword">while</span>(ct &lt; ROW &amp;&amp; fgets(input[ct], SIZE, <span class="built_in">stdin</span>) != <span class="literal">NULL</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        ptstr[ct] = input[ct];</span><br><span class="line">        ct++;</span><br><span class="line">    &#125;</span><br><span class="line">		<span class="keyword">while</span>(ch=getchar()!= <span class="string">'\n'</span> &amp;&amp; ch != EOF);     <span class="comment">// 清空缓冲区失败，无法清除EOF</span></span><br><span class="line">    setbuf(<span class="built_in">stdin</span>, <span class="literal">NULL</span>);                         <span class="comment">// setbuf重置缓冲区成功</span></span><br><span class="line">    <span class="built_in">scanf</span>(<span class="string">"%d"</span>, &amp;choice);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"%d\n"</span>, choice);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="strncpy和strncat"><a href="#strncpy和strncat" class="headerlink" title="strncpy和strncat"></a>strncpy和strncat</h2><p>strncpy 把一个字符串拷贝到另一个字符串数组中并限定拷贝字符的数量。</p>
+<p>注意：如果源字符串小于最大拷贝字符数量n，则拷贝整个字符串，包括空字符。但是，strncpy()拷贝字符串的长度不会超过n，如果拷贝到第n个字符时还未拷贝完整个源字符串，就不会拷贝空字符 (编译器可能会报错)。所以，拷贝的副本中不一定有空字符。鉴于此，要把 n 设置为比目标数组大小少1。</p>
+<ul>
+<li>参数1: 目标字符串数组的地址(指针)</li>
+<li>参数2: 待拷贝字符串(源字符串)的地址(指针)或字符串字面量</li>
+<li>参数3: 最大拷贝字符数量</li>
+</ul>
+<p>strcat()（用于拼接字符串）函数接受两个字符串和最大添加字符数作为参数。该函数把第 2个字符串的副本附加在第1个字符串末尾，并把拼接后形成的新字符串作为第1个字符串，第2个字符串不变。</p>
+<p>注意：如果源字符串长度小于最大添加字符数量n，则添加整个字符串，并在末尾加上空字符。但是，如果源字符串长度大于n，拷贝到第n个字符时还未拷贝完整个源字符串，就不会拷贝空字符 (编译器可能会报错)。所以，第1个字符串末尾不一定有空字符。鉴于此，要把 n 设置为比目标数组大小少1。</p>
+<ul>
+<li>参数1: 目标字符串数组的地址(指针)</li>
+<li>参数2: 待添加字符串(源字符串)的地址(指针)或字符串字面量</li>
+<li>参数3: 最大拷贝字符数量</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/06/13/%E6%95%B0%E7%BB%84%E5%92%8C%E6%8C%87%E9%92%88/" rel="prev" title="数组和指针">
+      <i class="fa fa-chevron-left"></i> 数组和指针
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/06/13/%E6%96%87%E4%BB%B6%E8%BE%93%E5%85%A5%E5%92%8C%E8%BE%93%E5%87%BA/" rel="next" title="文件输入和输出">
+      文件输入和输出 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#表示字符串和字符串I-O"><span class="nav-number">1.</span> <span class="nav-text">表示字符串和字符串I&#x2F;O</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#初始化字符串"><span class="nav-number">1.1.</span> <span class="nav-text">初始化字符串</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#字符串的数组形式和指针形式"><span class="nav-number">1.2.</span> <span class="nav-text">字符串的数组形式和指针形式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#数组形式和指针形式的不同"><span class="nav-number">1.3.</span> <span class="nav-text">数组形式和指针形式的不同</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#数组与指针的不同"><span class="nav-number">1.4.</span> <span class="nav-text">数组与指针的不同</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#字符串的数组"><span class="nav-number">2.</span> <span class="nav-text">字符串的数组</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#字符串数组与函数"><span class="nav-number">2.1.</span> <span class="nav-text">字符串数组与函数</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#EOF问题"><span class="nav-number">3.</span> <span class="nav-text">EOF问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#strncpy和strncat"><span class="nav-number">4.</span> <span class="nav-text">strncpy和strncat</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">崔梓坤</p>
+  <div class="site-description" itemprop="description">我的计算机学习经历和笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">15</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">崔梓坤</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>
