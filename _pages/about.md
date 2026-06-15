@@ -17,22 +17,6 @@ My current work focuses on developing large scale machine learning models for re
 
 Recommendation Systems, Large Language Models, AI Agents
 
-<h2 id="education">Education</h2>
-
-<div class="cv-entry">
-  <div class="cv-entry__main">
-    <strong>Stanford University</strong>, Stanford, CA<br />
-  </div>
-  <div class="cv-entry__date">Sep 2021 - Jun 2023</div>
-</div>
-
-<div class="cv-entry">
-  <div class="cv-entry__main">
-    <strong>Sun Yat-sen University</strong>, Guangzhou, China<br />
-  </div>
-  <div class="cv-entry__date">Sep 2016 - Jul 2020</div>
-</div>
-
 <h2 id="publications">Publications</h2>
 
 <ol class="compact-publications">
@@ -54,3 +38,21 @@ Reviewer
 - Information Technology and Control
 - Internet Technology Letters
 - Transactions on Consumer Electronics
+
+<h2 id="education">Background</h2>
+
+<div class="cv-entry">
+  <div class="cv-entry__main">
+    <strong>Stanford University</strong>, Stanford, CA<br />
+    Master of Science - MS<br />
+  </div>
+  <div class="cv-entry__date">Sep 2021 - Jun 2023</div>
+</div>
+
+<div class="cv-entry">
+  <div class="cv-entry__main">
+    <strong>Sun Yat-sen University</strong>, Guangzhou, China<br />
+    Bachelor of Engineering - BE<br />
+  </div>
+  <div class="cv-entry__date">Sep 2016 - Jul 2020</div>
+</div>
