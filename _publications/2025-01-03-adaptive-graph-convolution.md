@@ -5,7 +5,7 @@ category: conferences
 permalink: /publication/2025-01-03-adaptive-graph-convolution
 excerpt: "Adaptive graph convolution and semantic-guided attention for multimodal risk detection."
 date: 2025-01-03
-order: 5
+order: 6
 venue: "International Conference on Artificial Intelligence, Automation and High Performance Computing"
 paperurl: "https://doi.org/10.1109/AIAHPC66801.2025.11290280"
 citation: "Cuiqianhe Du, Chia-En Chiang, Tianyi Huang, and Zikun Cui. (2025). &quot;Adaptive Graph Convolution and Semantic-Guided Attention for Multimodal Risk Detection in Social Networks.&quot; <i>International Conference on Artificial Intelligence, Automation and High Performance Computing</i>, IEEE."
